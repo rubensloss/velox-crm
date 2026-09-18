@@ -1143,8 +1143,9 @@
       // Check day / time mention
       const hasDayOrTime = text.includes('sabado') || text.includes('sábado') || text.includes('domingo') || text.includes('sexta') || text.includes('amanha') || text.includes('amanhã') || text.includes('hoje') || text.includes('10h') || text.includes('15h') || text.includes('16h') || text.includes('de manha') || text.includes('de manhã') || text.includes('a tarde') || text.includes('à tarde');
 
-      // User accepting a previously proposed visit appointment
-      const isAcceptingProposedVisit = CONV_STATE.visitProposed && (hasDayOrTime || text.includes('pode ser') || text.includes('combinado') || text.includes('fechado') || text.includes('vamos marcar') || text.includes('quero') || text.includes('perfeito'));
+      // User accepting a previously proposed visit appointment or specifying day/time
+      const isAcceptingProposedVisit = (CONV_STATE.visitProposed || CONV_STATE.familyMentioned || CONV_STATE.activePropertyId) && hasDayOrTime && 
+        (text.includes('pode ser') || text.includes('combinado') || text.includes('fechado') || text.includes('vamos marcar') || text.includes('vamos agendar') || text.includes('quero') || text.includes('perfeito') || text.includes('sabado') || text.includes('sábado') || text.includes('domingo') || text.includes('sexta') || text.includes('10h') || text.includes('15h') || text.includes('16h') || text.includes('prefiro'));
 
       // Complete visit booking intent (triggers calendar card)
       const shouldBookVisitNow = (hasExplicitVisitKeyword && hasDayOrTime) || isAcceptingProposedVisit;
@@ -1310,46 +1311,49 @@
 
       // 5. LIFESTYLE / OBJECTIVE QUALIFICATION FOLLOW-UP
       if (mentionsMoradia || (mentionsFrenteMar && CONV_STATE.activeBairro === 'praia-da-costa')) {
+        CONV_STATE.familyMentioned = true;
         const props = PORTFOLIO_DB['praia-da-costa'];
-        CONV_STATE.visitProposed = true;
         appendAgentMessage(`
-          Perfeito! Para moradia familiar com exigência de alto padrão e localização frente mar absoluta, a <strong>Mansão Frente Mar na Av. Antônio Gil Veloso</strong> é o casamento exato.
+          Perfeito! Para moradia familiar com alto padrão de vida e localização frente mar definitiva, temos uma verdadeira joia na <strong>Av. Antônio Gil Veloso</strong>:
           <br><br>
-          São <strong>400m² privativos</strong> com acabamento primoroso, 4 suítes plenas (master com banheira de imersão debruçada no mar), living social de 120m² totalmente integrado à varanda gourmet e 4 vagas livres soltas no subsolo.
+          É a <strong>Mansão Frente Mar</strong>: são 400m² privativos, 4 suítes plenas (master com banheira de imersão debruçada no mar), living de 120m² integrado à varanda panorâmica e 4 vagas livres soltas no subsolo.
           <br><br>
-          O condomínio oferece estrutura completa estilo resort com segurança armada 24h e portaria blindada.
+          O condomínio conta com lazer resort completo e portaria blindada com segurança armada 24h.
           ${renderPropertyMiniCard(props[0])}
-          O que você acha de sentir a brisa e a iluminação ao vivo neste final de semana? Fica melhor para você <strong>nesta sexta-feira às 16h</strong> ou no <strong>sábado às 10h da manhã</strong>?
+          Esse perfil de metragem e vista atende ao que a sua família procura? Se quiser, posso te passar os custos de condomínio e IPTU, ou agendarmos um horário para você conhecer pessoalmente!
         `);
-        addAuditLog('QUALIFICAÇÃO PERFIL', 'Aderência Alta: Moradia Frente Mar', 'Lead direcionado para Mansão Frente Mar (R$ 3.8M). Dupla alternativa de visita ativada.');
+        addAuditLog('QUALIFICAÇÃO PERFIL', 'Aderência: Moradia Frente Mar', 'Lead direcionado para Mansão Frente Mar (R$ 3.8M). Mini-card apresentado.');
         return;
       }
 
       if (mentionsInvestimento) {
         appendAgentMessage(`
-          Excelente visão estratégica! A orla de Vila Velha registra valorização constante de <strong>+14% ao ano</strong> devido à escassez geográfica absoluta de novos terrenos frente mar.
+          Excelente visão estratégica! A orla de Vila Velha registra valorização constante de <strong>+14% ao ano</strong> pela escassez física de novos terrenos frente mar.
           <br><br>
-          Para composição de patrimônio imobiliário de alta performance:
+          Para investimento no bairro, temos dois perfis de destaque:
           <br><br>
-          • <strong>Edifício Atlantis (R$ 1.950.000):</strong> Na 2ª quadra da Praia da Costa, possui condomínio enxuto (R$ 1.100/mês) e liquidez imediata para locação executiva de alto padrão.<br>
-          • <strong>Mansão Frente Mar (R$ 3.800.000):</strong> Considerado um <em>trophy asset</em> — ativo de preservação de capital com blindagem inflacionária e raridade de mercado.
+          • <strong>Geração de Renda & Alta Liquidez:</strong> O <strong>Edifício Atlantis (R$ 1.95M)</strong> tem condomínio enxuto (R$ 1.100/mês) e altíssima procura para locação executiva de luxo.<br>
+          • <strong>Preservação Patrimonial (*Trophy Asset*):</strong> A <strong>Mansão Frente Mar (R$ 3.8M)</strong> na Gil Veloso, ativo raro com proteção inflacionária.
           <br><br>
-          O seu foco principal no investimento é <strong>geração de renda imediata com aluguel</strong> ou <strong>ganho de capital na valorização do metro quadrado</strong>?
+          O seu foco principal é <strong>gerar renda mensal com aluguel</strong> ou <strong>ganho de capital na valorização do metro quadrado</strong>?
         `);
-        addAuditLog('QUALIFICAÇÃO PERFIL', 'Investimento & Valorização', 'Apresentadas opções de renda e ganho de capital na orla.');
+        addAuditLog('QUALIFICAÇÃO PERFIL', 'Investimento & Valorização', 'Apresentadas opções de renda (Ed. Atlantis) e ganho patrimonial (Mansão Frente Mar).');
         return;
       }
 
       if (mentionsSegundaQuadra) {
         const props = PORTFOLIO_DB['praia-da-costa'];
-        CONV_STATE.visitProposed = true;
         appendAgentMessage(`
-          Uma escolha muito inteligente! A 2ª quadra da Praia da Costa, especialmente na região da Champagnat, alia sofisticação a uma atmosfera mais silenciosa, arborizada e reservada.
+          Uma escolha muito inteligente! A 2ª quadra da Praia da Costa, especialmente na região nobre da Champagnat, alia sofisticação a uma atmosfera mais silenciosa, arborizada e reservada.
           <br><br>
-          Temos a <strong>Residência Gourmet (260m², 4 suítes, R$ 2.850.000)</strong> com marcenaria Todeschini impecável e o <strong>Edifício Atlantis (180m², 3 suítes, R$ 1.950.000)</strong>.
+          Temos duas opções com esse perfil:
+          <br><br>
+          • <strong>Residência Gourmet (Champagnat):</strong> 260m², 4 suítes, 3 vagas, marcenaria Todeschini impecável — <em>R$ 2.850.000</em>.<br>
+          • <strong>Edifício Atlantis (2ª Quadra):</strong> 180m², 3 suítes, clube resort privativo — <em>R$ 1.950.000</em>.
           ${renderPropertyMiniCard(props[1])}
-          Podemos agendar uma visita para você conhecer essas duas plantas no mesmo dia: prefere sexta à tarde ou sábado de manhã?
+          Qual dessas metragens é mais confortável para a rotina de vocês?
         `);
+        addAuditLog('QUALIFICAÇÃO PERFIL', '2ª Quadra / Champagnat', 'Apresentadas opções na região nobre da Champagnat.');
         return;
       }
 
@@ -1448,62 +1452,50 @@
       }
 
       // 7. EXPLORATION / DISCOVERY: PRAIA DA COSTA
-      if (mentionsPraiaDaCosta) {
-        const props = PORTFOLIO_DB['praia-da-costa'];
+      if (mentionsPraiaDaCosta && !asksDisponiveis) {
+        CONV_STATE.activeBairro = 'praia-da-costa';
         const greetingPrefix = asksCumprimento 
           ? `Boa tarde! Seja muito bem-vindo à <strong>Velox Imóveis</strong>.<br><br>`
           : `Excelente escolha! `;
 
         appendAgentMessage(`
-          ${greetingPrefix}A <strong>Praia da Costa</strong> é, sem dúvida, a região mais nobre, valorizada e desejada de Vila Velha — unindo a conveniência de fazer tudo a pé com uma atmosfera costeira sofisticada.
+          ${greetingPrefix}A <strong>Praia da Costa</strong> é, sem dúvida, a região mais nobre, valorizada e desejada de Vila Velha.
           <br><br>
-          Para eu selecionar com precisão as unidades do nosso acervo que combinem com o seu estilo de vida, me conte dois pontos fundamentais:
+          Temos opções exclusivas selecionadas aqui no bairro. Para eu te direcionar exatamente o que faz sentido:
           <br><br>
-          🎯 <strong>Finalidade:</strong> O imóvel é para <strong>moradia da sua família</strong> ou com foco em <strong>investimento e valorização patrimonial</strong>?<br>
-          🌊 <strong>Localização:</strong> Você prioriza uma opção <strong>frente mar definitiva na Av. Antônio Gil Veloso</strong> (pé na areia com sol da manhã total), ou prefere uma <strong>segunda quadra mais reservada</strong>, como na região nobre da Champagnat?<br>
-          🛏️ <strong>Planta:</strong> Quantas suítes e vagas de garagem seriam ideais para vocês?
-          <br><br>
-          Hoje temos <strong>3 oportunidades selecionadas</strong> disponíveis no bairro:
-          <br><br>
-          1️⃣ <strong>Mansão Frente Mar (Gil Veloso):</strong> 400m², 4 suítes plenas, 4 vagas livres soltas, varanda cinematográfica debruçada no mar • <em>R$ 3.800.000</em>.<br>
-          2️⃣ <strong>Residência Gourmet (Champagnat / 2ª Quadra):</strong> 260m², 4 suítes, 3 vagas, marcenaria Todeschini, espaço gourmet privativo • <em>R$ 2.850.000</em>.<br>
-          3️⃣ <strong>Edifício Atlantis (2ª Quadra do Mar):</strong> 180m², 3 suítes, clube resort completo • <em>R$ 1.950.000</em>.
-          ${renderPropertyMiniCard(props[0])}
-          ${renderPropertyMiniCard(props[1])}
-          Você pode clicar em <strong>Ver Detalhes & Custos</strong> em qualquer um deles para conferir condomínio e IPTU, ou me dizer: qual dessas propostas mais se aproxima do que você busca?
+          Você busca um imóvel para <strong>moradia da sua família</strong> ou com foco em <strong>investimento</strong>?
+          E no momento, você prioriza <strong>frente mar definitiva</strong> (pé na areia na Gil Veloso) ou uma <strong>2ª quadra mais reservada</strong> (como na região nobre da Champagnat)?
         `);
-        addAuditLog('QUALIFICAÇÃO CONSULTIVA', 'Acolhimento & Curadoria Praia da Costa', 'ImobIA acolheu o lead, abriu qualificação de moradia/investimento e apresentou as 3 opções ativas com mini-cards.');
+        addAuditLog('ACOLHIMENTO INICIAL', 'Praia da Costa Selecionada', 'ImobIA acolheu o lead com elegância e abriu qualificação consultiva (moradia vs investimento | frente mar vs 2ª quadra).');
         return;
       }
 
       // 8. EXPLORATION / DISCOVERY: ITAPARICA
-      if (mentionsItaparica) {
-        const props = PORTFOLIO_DB['itaparica'];
+      if (mentionsItaparica && !asksDisponiveis) {
+        CONV_STATE.activeBairro = 'itaparica';
         appendAgentMessage(`
-          A <strong>Praia de Itaparica</strong> é atualmente a orla com maior índice de valorização de Vila Velha (+14% a.a.) e infraestrutura completa.
+          Excelente escolha! A <strong>Praia de Itaparica</strong> é a orla que mais valoriza em Vila Velha (+14% a.a.), com polo gastronômico e novos empreendimentos modernos.
           <br><br>
-          Temos <strong>2 joias raras</strong> disponíveis hoje no bairro:
+          Temos opções exclusivas frente mar aqui no bairro. Para eu te direcionar:
           <br><br>
-          💎 <strong>Cobertura Duplex Frente Mar:</strong> 320m², 3 suítes, piscina privativa aquecida no terraço, 3 vagas • <em>R$ 3.200.000</em>.<br>
-          🌊 <strong>Edifício Sunset Frente Mar:</strong> 190m², 3 suítes, varanda gourmet ampla integrada • <em>R$ 2.000.000</em>.
-          ${renderPropertyMiniCard(props[0])}
-          O que você acha de conhecer a Cobertura Duplex? A vista para o mar é 180° e o sol da manhã é definitivo.
+          Você busca para <strong>moradia da sua família</strong> ou <strong>investimento</strong>?
+          E vocês preferem a exclusividade de uma <strong>cobertura com piscina privativa</strong> ou a praticidade de um <strong>apartamento tipo frente mar</strong>?
         `);
-        addAuditLog('QUALIFICAÇÃO BAIRRO', 'Foco Definido: Itaparica', 'ImobIA apresentou Cobertura Duplex (R$ 3.2M) e Sunset (R$ 2.0M).');
+        addAuditLog('ACOLHIMENTO INICIAL', 'Itaparica Selecionada', 'ImobIA acolheu o lead e abriu qualificação consultiva para Itaparica.');
         return;
       }
 
       // 9. EXPLORATION / DISCOVERY: ITAPUÃ
-      if (mentionsItapua) {
-        const props = PORTFOLIO_DB['itapua'];
+      if (mentionsItapua && !asksDisponiveis) {
+        CONV_STATE.activeBairro = 'itapua';
         appendAgentMessage(`
           A <strong>Praia de Itapuã</strong> é perfeita para quem busca a comodidade de fazer tudo a pé, próxima aos melhores restaurantes e ao polo comercial da Hugo Musso.
           <br><br>
-          🏢 <strong>Apartamento Design Itapuã:</strong> 210m², 3 suítes plenas, 3 vagas cobertas, marcenaria impecável • <em>R$ 2.400.000</em>.
-          ${renderPropertyMiniCard(props[0])}
-          Faz sentido para o seu perfil de metragem e localização?
+          Temos uma unidade de design contemporâneo impecável no bairro (210m², 3 suítes, marcenaria pronta).
+          <br><br>
+          Você procura um imóvel pronto para morar de imediato ou estuda opções para personalizar?
         `);
-        addAuditLog('QUALIFICAÇÃO BAIRRO', 'Foco Definido: Itapuã', 'Apresentado Apartamento Design Itapuã (R$ 2.4M).');
+        addAuditLog('ACOLHIMENTO INICIAL', 'Itapuã Selecionada', 'ImobIA acolheu o lead e abriu qualificação consultiva para Itapuã.');
         return;
       }
 
