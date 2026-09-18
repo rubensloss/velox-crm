@@ -114,6 +114,13 @@
           <i class="fa-solid fa-chart-pie"></i>
           <span>BI, ROI & AVM m²</span>
         </a>
+
+        <div class="nav-section-label">IA AUTÔNOMA & ECOSSISTEMA</div>
+        <a href="#imobia" class="nav-item" data-tab="imobia">
+          <i class="fa-solid fa-brain text-gold"></i>
+          <span>Agente ImobIA Studio</span>
+          <span class="badge badge-gold">Autônomo</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -1174,6 +1181,348 @@
                   <span class="badge badge-emerald">Procura Constante</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 10: AGENTE IMOBIA MULTIMODAL STUDIO & AUTONOMOUS CRM INTEGRATION -->
+      <section id="view-imobia" class="view-panel">
+        <!-- Autopilot Header Status Banner -->
+        <div class="imobia-autopilot-banner">
+          <div class="autopilot-info">
+            <div class="autopilot-badge pulse-fast">
+              <i class="fa-solid fa-brain text-gold"></i>
+              <span>PILOTO AUTOMÁTICO DO CRM: <strong>ATIVADO</strong></span>
+            </div>
+            <div class="autopilot-desc">
+              O Agente ImobIA possui <strong>autonomia total</strong> no VELOX CRM: cadastra leads, qualifica dados, movimenta fases no Kanban e agenda no Google Calendar sem intervenção humana.
+            </div>
+          </div>
+          <div class="autopilot-actions">
+            <button class="btn-gold" onclick="triggerAutonomousCycleDemo()">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Executar Ciclo Autônomo (Demo)</span>
+            </button>
+            <div class="toggle-wrapper" title="Desativar/Ativar Piloto Automático">
+              <label class="switch">
+                <input type="checkbox" id="imobiaAutopilotToggle" checked onchange="toggleAutopilotMode(this.checked)" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Studio Grid Layout -->
+        <div class="imobia-studio-grid">
+          <!-- Left Column: Multimodal Control Center -->
+          <div class="studio-controls-card">
+            <!-- Studio Tab Pills -->
+            <div class="studio-tabs-row">
+              <button class="studio-tab-btn active" onclick="switchStudioTab('audio')">
+                <i class="fa-solid fa-microphone text-emerald"></i> <span>Áudio WhatsApp</span>
+              </button>
+              <button class="studio-tab-btn" onclick="switchStudioTab('photos')">
+                <i class="fa-solid fa-image text-blue"></i> <span>Fotos & Vídeo</span>
+              </button>
+              <button class="studio-tab-btn" onclick="switchStudioTab('deed')">
+                <i class="fa-solid fa-file-contract text-gold"></i> <span>Matrícula (PDF)</span>
+              </button>
+              <button class="studio-tab-btn" onclick="switchStudioTab('income')">
+                <i class="fa-solid fa-file-invoice-dollar text-purple"></i> <span>Crédito (Holerite)</span>
+              </button>
+              <button class="studio-tab-btn" onclick="switchStudioTab('calendar')">
+                <i class="fa-solid fa-calendar-check text-emerald"></i> <span>Google Calendar</span>
+              </button>
+              <button class="studio-tab-btn" onclick="switchStudioTab('followup')">
+                <i class="fa-solid fa-arrows-spin text-amber"></i> <span>Follow-up 4x</span>
+              </button>
+              <button class="studio-tab-btn" onclick="switchStudioTab('nps')">
+                <i class="fa-solid fa-star text-gold"></i> <span>NPS Google 5★</span>
+              </button>
+            </div>
+
+            <!-- Tab Content 1: AUDIO -->
+            <div class="studio-pane active" id="pane-audio">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-headphones text-emerald"></i> Compreensão de Áudio Natural & Extração</h4>
+                <span class="badge badge-emerald">Gemini 2.5 Flash Speech-to-Intent</span>
+              </div>
+              <p class="pane-desc">Simule o recebimento de um áudio de WhatsApp de um comprador de alto padrão e observe a transcrição e qualificação autônoma:</p>
+              
+              <div class="audio-interactive-box">
+                <button class="btn-play-sample" id="btnPlayStudioAudio" onclick="playStudioAudioDemo()">
+                  <i class="fa-solid fa-play"></i> <span>Ouvir Áudio do Lead (0:24)</span>
+                </button>
+                <div class="audio-sample-meta">
+                  <strong>Dr. Eduardo Albuquerque</strong> • Mansão Frente Mar • Praia da Costa
+                </div>
+              </div>
+
+              <div class="audio-result-box" id="audioResultBox">
+                <div class="transcript-line">
+                  <span class="badge badge-gold">Transcrição Automática:</span>
+                  <p id="studioAudioTranscript">"Olá Roberto, tudo bom? Aqui é o Dr. Eduardo. Vi o anúncio da Mansão na Gil Veloso na Praia da Costa. Gostei muito da varanda gourmet, mas preciso de pelo menos 4 vagas soltas na garagem e tenho dois labradores. O proprietário aceitaria permuta por um apartamento meu de 3 quartos de cerca de 1.2 milhão? Se der negócio, posso visitar no sábado às 10h."</p>
+                </div>
+
+                <div class="extracted-grid">
+                  <div class="extract-item">
+                    <span class="extract-label">Orçamento Detectado:</span>
+                    <strong class="text-gold">R$ 3.800.000 (Alto Padrão)</strong>
+                  </div>
+                  <div class="extract-item">
+                    <span class="extract-label">Bairro Prioritário:</span>
+                    <strong>Praia da Costa (Orla)</strong>
+                  </div>
+                  <div class="extract-item">
+                    <span class="extract-label">Critério Pet & Garagem:</span>
+                    <strong>Pet-friendly + 4 Vagas Soltas</strong>
+                  </div>
+                  <div class="extract-item">
+                    <span class="extract-label">Condição de Negociação:</span>
+                    <strong class="text-blue">Permuta de R$ 1.2M proposta</strong>
+                  </div>
+                </div>
+
+                <div class="auto-crm-trigger-bar">
+                  <span class="text-muted"><i class="fa-solid fa-bolt text-gold"></i> Ação Autônoma no CRM:</span>
+                  <button class="btn-micro btn-emerald" onclick="executeAutonomousAudioLead()">
+                    <i class="fa-solid fa-check-double"></i> Cadastrar & Mover Lead no Pipeline
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content 2: PHOTOS & VIDEO -->
+            <div class="studio-pane" id="pane-photos">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-camera-retro text-blue"></i> Inspeção Visual de Acabamentos & Copywriter</h4>
+                <span class="badge badge-blue">Gemini Multimodal Vision</span>
+              </div>
+              <p class="pane-desc">A IA inspeciona fotos da fachada, varanda e acabamento interno, detecta atributos de luxo e gera a ficha técnica para portais:</p>
+              
+              <div class="property-vision-preview">
+                <img src="assets/cena-1.jpg" alt="Mansão Frente Mar" class="vision-img-sample" />
+                <div class="vision-tags-detected">
+                  <span class="tag-pill"><i class="fa-solid fa-check text-emerald"></i> Vista Eterna para o Mar</span>
+                  <span class="tag-pill"><i class="fa-solid fa-check text-emerald"></i> Varanda Gourmet com Churrasqueira</span>
+                  <span class="tag-pill"><i class="fa-solid fa-check text-emerald"></i> Piso Porcelanato 120x120 Calacata</span>
+                  <span class="tag-pill"><i class="fa-solid fa-check text-emerald"></i> Esquadrias com Atenuação Acústica</span>
+                  <span class="tag-pill"><i class="fa-solid fa-check text-emerald"></i> Bancadas em Mármore Michelangelo</span>
+                </div>
+              </div>
+
+              <div class="vision-copy-box">
+                <div class="copy-box-header">
+                  <span><i class="fa-solid fa-sparkles text-gold"></i> Copy de Alto Luxo Gerado pelo ImobIA:</span>
+                  <button class="btn-micro" onclick="copyVisionText()"><i class="fa-solid fa-copy"></i> Copiar</button>
+                </div>
+                <div class="copy-box-text" id="visionCopyText">
+                  "Exclusividade Absoluta na Orla da Praia da Costa: Mansão Suspensa com 400m² privativos, 4 suítes plenas e varanda gourmet cinematográfica debruçada sobre o mar. Acabamentos nobres em mármore Michelangelo, living para 4 ambientes e 4 vagas livres. O ápice do conforto com privacidade inegociável."
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content 3: DEED (MATRÍCULA PDF) -->
+            <div class="studio-pane" id="pane-deed">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-file-shield text-gold"></i> Auditoria Jurídica de Matrícula (PDF)</h4>
+                <span class="badge badge-gold">Leitura de Certidões RGI</span>
+              </div>
+              <p class="pane-desc">Leitura instantânea da matrícula imobiliária para identificar proprietários, área real, fração ideal e ausência de penhoras:</p>
+
+              <div class="deed-report-box">
+                <div class="deed-header-status">
+                  <div>
+                    <strong>Matrícula Nº 64.821</strong> • Cartório do 1º Ofício de RGI de Vila Velha/ES
+                  </div>
+                  <span class="badge badge-emerald"><i class="fa-solid fa-shield-check"></i> 100% REGULAR / SEM ÔNUS</span>
+                </div>
+
+                <div class="deed-fields-grid">
+                  <div class="deed-field">
+                    <span>Área Privativa Real:</span>
+                    <strong>398,50 m²</strong>
+                  </div>
+                  <div class="deed-field">
+                    <span>Área Total Construída:</span>
+                    <strong>522,10 m²</strong>
+                  </div>
+                  <div class="deed-field">
+                    <span>Proprietário Atual:</span>
+                    <strong>Dr. Fernando Henrique Silveira</strong>
+                  </div>
+                  <div class="deed-field">
+                    <span>Hipotecas ou Penhoras:</span>
+                    <strong class="text-emerald">Baixadas via Av-5 (Livre de Gravames)</strong>
+                  </div>
+                </div>
+
+                <div class="deed-alert-safe">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span><strong>Laudo de Conformidade do ImobIA:</strong> Imóvel com documentação apta para escrituração pública definitiva e financiamento bancário imediato.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content 4: INCOME (HOLERITE / CAIXA SAC) -->
+            <div class="studio-pane" id="pane-income">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-calculator text-purple"></i> Análise de Renda & Pré-Aprovação Caixa SAC</h4>
+                <span class="badge badge-purple">Regra Bancária 30%</span>
+              </div>
+              <p class="pane-desc">O agente avalia a capacidade financeira do comprador em segundos para evitar visitas frustradas:</p>
+
+              <div class="income-calc-demo">
+                <div class="income-input-row">
+                  <div class="input-col">
+                    <label>Renda Bruta Mensal do Comprador:</label>
+                    <input type="text" id="demoIncomeVal" value="R$ 45.000,00" class="input-dark" />
+                  </div>
+                  <div class="input-col">
+                    <label>Valor do Imóvel Buscado:</label>
+                    <input type="text" id="demoPropertyVal" value="R$ 3.800.000,00" class="input-dark" />
+                  </div>
+                  <div class="input-col btn-col">
+                    <button class="btn-primary" onclick="runStudioCreditAudit()">
+                      <i class="fa-solid fa-magnifying-glass-dollar"></i> Calcular Viabilidade
+                    </button>
+                  </div>
+                </div>
+
+                <div class="income-results-grid" id="studioCreditResults">
+                  <div class="credit-metric">
+                    <span>Comprometimento Máx. (30%):</span>
+                    <strong class="text-gold">R$ 13.500 / mês</strong>
+                  </div>
+                  <div class="credit-metric">
+                    <span>1ª Parcela Estimada Caixa SAC:</span>
+                    <strong class="text-emerald">R$ 11.890 / mês</strong>
+                  </div>
+                  <div class="credit-metric">
+                    <span>Entrada Necessária (20%):</span>
+                    <strong>R$ 760.000</strong>
+                  </div>
+                  <div class="credit-metric">
+                    <span>Status de Crédito:</span>
+                    <span class="badge badge-emerald">PRÉ-APROVADO 100%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content 5: GOOGLE CALENDAR -->
+            <div class="studio-pane" id="pane-calendar">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-calendar-plus text-emerald"></i> Agendamento Direto no Google Calendar</h4>
+                <span class="badge badge-emerald">Google Calendar API v3</span>
+              </div>
+              <p class="pane-desc">O ImobIA consulta a disponibilidade do corretor, reserva o horário na agenda e envia o convite formal com link de rota no Waze:</p>
+
+              <div class="calendar-preview-card">
+                <div class="cal-header">
+                  <div class="cal-title">
+                    <i class="fa-solid fa-calendar-day text-gold"></i>
+                    <strong>Visita Imobiliária: Dr. Eduardo Albuquerque</strong>
+                  </div>
+                  <span class="badge badge-emerald">Confirmado na Agenda</span>
+                </div>
+                <div class="cal-details">
+                  <p><i class="fa-regular fa-clock text-gold"></i> <strong>Sábado, 20 de Setembro • 10:00 às 11:00</strong></p>
+                  <p><i class="fa-solid fa-location-dot text-red"></i> Av. Antônio Gil Veloso, 2100 - Praia da Costa, Vila Velha/ES</p>
+                  <p><i class="fa-solid fa-user-tie text-blue"></i> Corretor Acompanhante: Roberto Mantovani (Top Producer)</p>
+                </div>
+                <div class="cal-action-links">
+                  <a href="https://calendar.google.com" target="_blank" class="btn-micro btn-emerald">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Google Agenda
+                  </a>
+                  <a href="https://waze.com" target="_blank" class="btn-micro">
+                    <i class="fa-solid fa-diamond-turn-right text-blue"></i> Traçar Rota no Waze
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content 6: FOLLOW-UP CASCATA -->
+            <div class="studio-pane" id="pane-followup">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-clock-rotate-left text-amber"></i> Régua de Follow-up em Cascata (4 Etapas)</h4>
+                <span class="badge badge-amber">Resgate Anti-Esfriamento</span>
+              </div>
+              <p class="pane-desc">Sequência estratégica automatizada para reengajar o comprador sem parecer invasivo:</p>
+
+              <div class="followup-steps-selector">
+                <button class="step-chip active" onclick="selectFollowupStep('2h')">2 Horas (Calor)</button>
+                <button class="step-chip" onclick="selectFollowupStep('24h')">24 Horas (Estudo)</button>
+                <button class="step-chip" onclick="selectFollowupStep('48h')">48 Horas (Negociação)</button>
+                <button class="step-chip" onclick="selectFollowupStep('7d')">7 Dias (Resgate)</button>
+              </div>
+
+              <div class="followup-display-box" id="followupDisplayBox">
+                <div class="followup-meta">
+                  <strong id="fuStageTitle">Etapa: 2 Horas Pós-Visita (No Calor da Decisão)</strong>
+                  <span class="text-muted" id="fuStageGoal">Objetivo: Colher a impressão antes que o cliente converse com terceiros.</span>
+                </div>
+                <div class="followup-text" id="fuMessageContent">
+                  "Boa tarde, Dr. Eduardo! Foi um prazer apresentar a Mansão Frente Mar para o senhor hoje. Fiquei com aquela sensação de que a varanda e o espaço para os carros atenderam perfeitamente o que sua família precisa. Como foi a sua primeira impressão ao ver os detalhes de perto?"
+                </div>
+                <button class="btn-micro btn-gold" onclick="sendActiveFollowupWhatsApp()">
+                  <i class="fa-brands fa-whatsapp"></i> Disparar via WhatsApp
+                </button>
+              </div>
+            </div>
+
+            <!-- Tab Content 7: NPS GOOGLE 5 ESTRELAS -->
+            <div class="studio-pane" id="pane-nps">
+              <div class="pane-header">
+                <h4><i class="fa-solid fa-star-half-stroke text-gold"></i> Pesquisa de Satisfação NPS & Efeito Bola de Neve</h4>
+                <span class="badge badge-gold">Google Meu Negócio 5★</span>
+              </div>
+              <p class="pane-desc">Pesquisa automática que transforma clientes encantados em avaliações 5 estrelas no mapa e novas indicações:</p>
+
+              <div class="nps-interactive-bar">
+                <span>Selecione a nota dada pelo cliente (0 a 10):</span>
+                <div class="nps-rating-chips">
+                  <button class="nps-chip" onclick="rateNpsDemo(6)">6 (Detrator)</button>
+                  <button class="nps-chip" onclick="rateNpsDemo(8)">8 (Neutro)</button>
+                  <button class="nps-chip active" onclick="rateNpsDemo(10)">10 (Promotor ★★★★★)</button>
+                </div>
+              </div>
+
+              <div class="nps-outcome-card" id="npsOutcomeCard">
+                <div class="nps-outcome-badge badge-emerald">
+                  <i class="fa-solid fa-crown"></i> CLIENTE PROMOTOR DETECTADO (NOTA 10)
+                </div>
+                <div class="nps-outcome-text" id="npsOutcomeText">
+                  "Muito obrigado pela avaliação nota 10, Dr. Eduardo! Ficamos honrados em atendê-lo com excelência. O senhor se importaria de deixar esse mesmo relato de 5 estrelas no nosso Google Maps? Leva 30 segundos e nos ajuda muito: <strong>g.page/r/velox-imoveis/review</strong><br><br>Ah, se tiver 2 ou 3 amigos buscando imóveis na Praia da Costa, será uma alegria cuidar deles também!"
+                </div>
+                <div class="nps-benefit-note">
+                  <i class="fa-solid fa-arrow-trend-up text-emerald"></i>
+                  <span><strong>Efeito Bola de Neve:</strong> Cada nota 10 melhora o ranqueamento orgânico da imobiliária no mapa local do Google, atraindo mais compradores sem custo de tráfego pago.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Autonomous CRM Audit Feed -->
+          <div class="studio-audit-card">
+            <div class="audit-card-header">
+              <div>
+                <h3><i class="fa-solid fa-terminal text-gold"></i> Feed de Ações Autônomas do CRM</h3>
+                <p>Registro em tempo real de mutações que o ImobIA executa no banco de dados</p>
+              </div>
+              <button class="btn-micro" onclick="clearAuditLog()" title="Limpar histórico"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+            </div>
+
+            <!-- Health Status Indicators -->
+            <div class="api-health-bar">
+              <span class="health-pill"><i class="fa-solid fa-circle text-emerald"></i> Meta API: Ativa</span>
+              <span class="health-pill"><i class="fa-solid fa-circle text-emerald"></i> Calendar: Conectado</span>
+              <span class="health-pill"><i class="fa-solid fa-circle text-emerald"></i> Gemini 2.5: OK</span>
+            </div>
+
+            <!-- Log Entries Stream -->
+            <div class="audit-log-stream" id="auditLogStream">
+              <!-- Logs populated dynamically -->
             </div>
           </div>
         </div>

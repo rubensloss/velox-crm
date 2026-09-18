@@ -354,7 +354,8 @@ function switchTab(tabId) {
     'modo-visita': { title: 'Modo Visita (Campo)', sub: 'Ficha sigilosa para uso do corretor no celular durante a visita com o comprador' },
     'credito': { title: 'Esteira de Crédito & Financiamento', sub: 'Simulador financeiro Caixa / Itaú (SAC vs Price) e checklist de aprovação' },
     'documentos': { title: 'Gestão Documental & Assinatura Digital', sub: 'Auditoria de certidões e formalização via ZapSign' },
-    'bi-avm': { title: 'BI, Análise de ROI & AVM m²', sub: 'Custo por lead por portal e precificação imobiliária baseada em inteligência de dados' }
+    'bi-avm': { title: 'BI, Análise de ROI & AVM m²', sub: 'Custo por lead por portal e precificação imobiliária baseada em inteligência de dados' },
+    'imobia': { title: 'Agente ImobIA Multimodal Studio', sub: 'Laboratório interativo: Autonomia total de CRM, Áudio, Fotos, PDFs, Google Calendar e NPS' }
   };
 
   const info = titles[tabId] || { title: 'VELOX CRM', sub: 'Gestão Imobiliária com IA' };
@@ -1434,3 +1435,404 @@ function showToast(message, type = 'gold') {
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
+
+// ==========================================================================
+// 12. AGENTE IMOBIA: ESTÚDIO MULTIMODAL & INTEGRAÇÃO AUTÔNOMA COM CRM
+// ==========================================================================
+
+const IMOBIA_STATE = {
+  autopilotActive: true,
+  currentStudioTab: 'audio',
+  auditLogs: [
+    {
+      time: '14:30:12',
+      type: 'CADASTRO AUTOMÁTICO',
+      badge: 'badge-emerald',
+      title: 'Lead Inserido via Webhook WhatsApp',
+      detail: 'Dr. Eduardo Albuquerque (+55 27 99812-4400) registrado na base com origem ZAP Imóveis.'
+    },
+    {
+      time: '14:30:45',
+      type: 'QUALIFICAÇÃO & ATUALIZAÇÃO',
+      badge: 'badge-gold',
+      title: 'Perfil Enriquecido por Transcrição de Áudio',
+      detail: 'Orçamento atualizado para R$ 3.8M | 4 suítes | Preferência: Praia da Costa | Permuta: R$ 1.2M.'
+    },
+    {
+      time: '14:31:02',
+      type: 'TRANSIÇÃO NO PIPELINE',
+      badge: 'badge-blue',
+      title: 'Avanço Automático de Fase no Kanban',
+      detail: 'Lead Dr. Eduardo movido de [Novo Lead] → [Qualificado / IA] com taxa de confiança 98%.'
+    },
+    {
+      time: '14:31:30',
+      type: 'GOOGLE CALENDAR API',
+      badge: 'badge-emerald',
+      title: 'Visita Sincronizada na Agenda do Corretor',
+      detail: 'Evento criado para Sábado às 10:00 (Mansão Frente Mar) com convite para roberto@veloximoveis.com.br.'
+    },
+    {
+      time: '14:31:33',
+      type: 'TRANSIÇÃO NO PIPELINE',
+      badge: 'badge-purple',
+      title: 'Avanço Automático de Fase no Kanban',
+      detail: 'Lead Dr. Eduardo movido de [Qualificado / IA] → [Visita Agendada].'
+    }
+  ]
+};
+
+// Render initial logs
+document.addEventListener('DOMContentLoaded', () => {
+  renderAuditLogs();
+});
+
+function renderAuditLogs() {
+  const container = document.getElementById('auditLogStream');
+  if (!container) return;
+
+  container.innerHTML = IMOBIA_STATE.auditLogs.map(log => `
+    <div class="log-entry">
+      <div class="log-header">
+        <span class="badge ${log.badge}">${log.type}</span>
+        <span class="log-time">${log.time}</span>
+      </div>
+      <div class="log-title">${log.title}</div>
+      <div class="log-detail">${log.detail}</div>
+    </div>
+  `).join('');
+}
+
+function logAutonomousAction(type, title, detail, badge = 'badge-gold') {
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  
+  IMOBIA_STATE.auditLogs.unshift({
+    time: timeStr,
+    type: type,
+    badge: badge,
+    title: title,
+    detail: detail
+  });
+
+  if (IMOBIA_STATE.auditLogs.length > 25) {
+    IMOBIA_STATE.auditLogs.pop();
+  }
+
+  renderAuditLogs();
+}
+
+function clearAuditLog() {
+  IMOBIA_STATE.auditLogs = [];
+  renderAuditLogs();
+  showToast('Histórico de auditoria do ImobIA limpo.', 'blue');
+}
+
+function toggleAutopilotMode(checked) {
+  IMOBIA_STATE.autopilotActive = checked;
+  const banner = document.querySelector('.imobia-autopilot-banner');
+  const badge = document.querySelector('.autopilot-badge');
+
+  if (checked) {
+    badge.innerHTML = '<i class="fa-solid fa-brain text-gold"></i> <span>PILOTO AUTOMÁTICO DO CRM: <strong>ATIVADO</strong></span>';
+    showToast('🤖 Piloto Automático ImobIA Ativado: Autonomia total para cadastrar, alterar e mover leads!', 'emerald');
+    logAutonomousAction('SISTEMA', 'Piloto Automático Ativado', 'O Agente ImobIA assumiu a operação autônoma do CRM.', 'badge-emerald');
+  } else {
+    badge.innerHTML = '<i class="fa-solid fa-hand text-muted"></i> <span>PILOTO AUTOMÁTICO: <strong>PAUSADO (MODO MANUAL)</strong></span>';
+    showToast('⏸️ Piloto Automático Pausado: O CRM aguardará aprovação humana para cada transição.', 'gold');
+    logAutonomousAction('SISTEMA', 'Piloto Automático Pausado', 'Transições de pipeline agora requerem ação manual do corretor.', 'badge-amber');
+  }
+}
+
+function switchStudioTab(tabId) {
+  IMOBIA_STATE.currentStudioTab = tabId;
+
+  // Toggle Tab Buttons
+  document.querySelectorAll('.studio-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${tabId}'`));
+  });
+
+  // Toggle Panes
+  document.querySelectorAll('.studio-pane').forEach(pane => {
+    pane.classList.toggle('active', pane.id === `pane-${tabId}`);
+  });
+}
+
+function playStudioAudioDemo() {
+  const btn = document.getElementById('btnPlayStudioAudio');
+  if (!btn) return;
+
+  btn.innerHTML = '<i class="fa-solid fa-circle-pause fa-beat"></i> <span>Ouvindo & Transcrevendo com IA...</span>';
+  btn.classList.add('btn-emerald');
+
+  showToast('🎙️ ImobIA processando áudio multimodal com Gemini 2.5 Flash...', 'gold');
+
+  setTimeout(() => {
+    btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> <span>Ouvir Áudio Novamente (0:24)</span>';
+    btn.classList.remove('btn-emerald');
+    showToast('✅ Áudio transcrito e intenções imobiliárias extraídas com sucesso!', 'emerald');
+    
+    logAutonomousAction(
+      'ÁUDIO MULTIMODAL',
+      'Transcrição e Compreensão de Áudio Concluída',
+      'Áudio de 24s processado: Detectado Dr. Eduardo Albuquerque buscando Mansão Frente Mar com permuta de R$ 1.2M.',
+      'badge-emerald'
+    );
+  }, 1400);
+}
+
+function executeAutonomousAudioLead() {
+  // Check if Dr Eduardo exists
+  let lead = LEADS.find(l => l.name.includes('Eduardo'));
+  if (lead) {
+    lead.stage = 'qualificado';
+    lead.formaPagamento = '60% Entrada + Permuta R$ 1.2M';
+    renderKanbanBoard();
+    
+    logAutonomousAction(
+      'TRANSIÇÃO NO PIPELINE',
+      'Lead Movido Autonomamente',
+      `ImobIA moveu ${lead.name} para [Qualificado / IA] com dados de permuta e urgência validados.`,
+      'badge-blue'
+    );
+    
+    showToast(`🤖 ImobIA moveu ${lead.name} para "Qualificado / IA" no Kanban!`, 'emerald');
+  }
+}
+
+function copyVisionText() {
+  const txt = document.getElementById('visionCopyText')?.innerText;
+  if (txt) {
+    navigator.clipboard.writeText(txt);
+    showToast('Copy de alto padrão copiada para a área de transferência!', 'emerald');
+  }
+}
+
+function runStudioCreditAudit() {
+  const incomeStr = document.getElementById('demoIncomeVal')?.value || '45000';
+  const num = parseFloat(incomeStr.replace(/[^0-9]/g, '')) / 100 || 45000;
+  
+  showToast('Calculando margem bancária Caixa SAC (Regra dos 30%)...', 'gold');
+
+  const maxMargem = num * 0.30;
+  const parcelaEstimada = 11890;
+
+  const status = parcelaEstimada <= maxMargem ? 'PRÉ-APROVADO 100%' : 'NECESSITA COMPOSIÇÃO';
+  const badgeClass = parcelaEstimada <= maxMargem ? 'badge-emerald' : 'badge-amber';
+
+  const container = document.getElementById('studioCreditResults');
+  if (container) {
+    container.innerHTML = `
+      <div class="credit-metric">
+        <span>Comprometimento Máx. (30%):</span>
+        <strong class="text-gold">R$ ${maxMargem.toLocaleString('pt-BR', { maximumFractionDigits: 0 })} / mês</strong>
+      </div>
+      <div class="credit-metric">
+        <span>1ª Parcela Estimada Caixa SAC:</span>
+        <strong class="text-emerald">R$ ${parcelaEstimada.toLocaleString('pt-BR', { maximumFractionDigits: 0 })} / mês</strong>
+      </div>
+      <div class="credit-metric">
+        <span>Entrada Necessária (20%):</span>
+        <strong>R$ 760.000</strong>
+      </div>
+      <div class="credit-metric">
+        <span>Status de Crédito:</span>
+        <span class="badge ${badgeClass}">${status}</span>
+      </div>
+    `;
+  }
+
+  logAutonomousAction(
+    'ESTEIRA DE CRÉDITO',
+    'Auditoria de Capacidade de Pagamento',
+    `Renda de R$ ${num.toLocaleString('pt-BR')} suporta parcela Caixa SAC de R$ ${parcelaEstimada.toLocaleString('pt-BR')}. Status: ${status}.`,
+    'badge-purple'
+  );
+}
+
+function selectFollowupStep(step) {
+  document.querySelectorAll('.step-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${step}'`));
+  });
+
+  const titles = {
+    '2h': {
+      title: 'Etapa: 2 Horas Pós-Visita (No Calor da Decisão)',
+      goal: 'Objetivo: Colher a primeira impressão antes que o cliente converse com terceiros.',
+      msg: '"Boa tarde, Dr. Eduardo! Foi um prazer apresentar a Mansão Frente Mar para o senhor hoje. Fiquei com aquela sensação de que a varanda e o espaço para os carros atenderam perfeitamente o que sua família precisa. Como foi a sua primeira impressão ao ver os detalhes de perto?"'
+    },
+    '24h': {
+      title: 'Etapa: 24 Horas (Envio do Estudo de Viabilidade Financeira)',
+      goal: 'Objetivo: Entregar números concretos e simulação bancária Caixa SAC.',
+      msg: '"Olá, Dr. Eduardo! Preparei o estudo analítico de aquisição da Mansão Frente Mar, incluindo a amortização decrescente pela Caixa e a estimativa de ITBI e emolumentos. Quer que eu te envie o PDF por aqui ou prefere que a gente passe um café no escritório para alinhar os números?"'
+    },
+    '48h': {
+      title: 'Etapa: 48 Horas (Checagem de Decisão & Negociação de Permuta)',
+      goal: 'Objetivo: Validar aceite do proprietário para permuta ou contraproposta.',
+      msg: '"Dr. Eduardo, tudo bem? Conversei com o proprietário hoje cedo sobre a permuta pelo seu apartamento de 3 quartos. Ele se mostrou muito receptivo para avançarmos esta semana. Faz sentido montarmos uma carta de proposta hoje?"'
+    },
+    '7d': {
+      title: 'Etapa: 7 Dias (Resgate Elegante com Oportunidade Exclusiva)',
+      goal: 'Objetivo: Reativar contato apresentando imóvel exclusivo antes de ir aos portais.',
+      msg: '"Olá Dr. Eduardo, tudo bem? Acabou de entrar na nossa carteira com exclusividade uma cobertura novinha na orla da Praia da Costa com 4 vagas livres e lazer cinematográfico, com condição de entrada ainda mais flexível. Se quiser, te mando o tour em vídeo em primeira mão!"'
+    }
+  };
+
+  const item = titles[step] || titles['2h'];
+  document.getElementById('fuStageTitle').textContent = item.title;
+  document.getElementById('fuStageGoal').textContent = item.goal;
+  document.getElementById('fuMessageContent').textContent = item.msg;
+}
+
+function sendActiveFollowupWhatsApp() {
+  const msg = document.getElementById('fuMessageContent')?.innerText;
+  switchTab('whatsapp');
+  const input = document.getElementById('waMessageInput');
+  if (input && msg) {
+    input.value = msg.replace(/^"|"$/g, '');
+    sendWaMessage();
+  }
+}
+
+function rateNpsDemo(score) {
+  document.querySelectorAll('.nps-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`(${score})`));
+  });
+
+  const card = document.getElementById('npsOutcomeCard');
+  if (!card) return;
+
+  if (score >= 9) {
+    card.innerHTML = `
+      <div class="nps-outcome-badge badge-emerald">
+        <i class="fa-solid fa-crown"></i> CLIENTE PROMOTOR DETECTADO (NOTA ${score})
+      </div>
+      <div class="nps-outcome-text">
+        "Muito obrigado pela avaliação nota ${score}, Dr. Eduardo! Ficamos honrados em atendê-lo com excelência. O senhor se importaria de deixar esse mesmo relato de 5 estrelas no nosso Google Maps? Leva 30 segundos e nos ajuda muito: <strong>g.page/r/velox-imoveis/review</strong><br><br>Ah, se tiver 2 ou 3 amigos buscando imóveis na Praia da Costa, será uma alegria cuidar deles também!"
+      </div>
+      <div class="nps-benefit-note">
+        <i class="fa-solid fa-arrow-trend-up text-emerald"></i>
+        <span><strong>Efeito Bola de Neve:</strong> Cada nota 10 melhora o ranqueamento orgânico da imobiliária no mapa local do Google, atraindo mais compradores sem custo de tráfego pago.</span>
+      </div>
+    `;
+
+    logAutonomousAction(
+      'REPUTAÇÃO / GOOGLE MEU NEGÓCIO',
+      'Cliente Promotor Encaminhado para 5 Estrelas',
+      `Nota ${score} registrada para Dr. Eduardo. Link de avaliação no Google Maps e convite para 3 indicações disparados.`,
+      'badge-emerald'
+    );
+  } else if (score >= 7) {
+    card.innerHTML = `
+      <div class="nps-outcome-badge badge-blue">
+        <i class="fa-solid fa-thumbs-up"></i> CLIENTE NEUTRO (NOTA ${score})
+      </div>
+      <div class="nps-outcome-text">
+        "Agradecemos muito pelo seu retorno nota ${score}, Dr. Eduardo! Estamos sempre aperfeiçoando nosso portfólio. O que nós poderíamos ter feito de diferente para tornar a sua experiência uma nota 10?"
+      </div>
+    `;
+    logAutonomousAction('NPS', 'Feedback Neutro Registrado', `Nota ${score} coletada com pesquisa qualitativa de aprimoramento.`, 'badge-blue');
+  } else {
+    card.innerHTML = `
+      <div class="nps-outcome-badge badge-red">
+        <i class="fa-solid fa-triangle-exclamation"></i> ALERTA VERMELHO: CLIENTE DETRATOR (NOTA ${score})
+      </div>
+      <div class="nps-outcome-text">
+        "Olá, Dr. Eduardo. Lamentamos profundamente que o atendimento não tenha sido nota 10. Nossa diretoria de relacionamento entrará em contato pessoalmente nas próximas 2 horas para entender o ocorrido."
+      </div>
+      <div class="nps-benefit-note" style="border-color: rgba(248, 113, 113, 0.3);">
+        <i class="fa-solid fa-bell text-red"></i>
+        <span><strong>Ação Imediata de Blindagem:</strong> Alerta prioritário disparado para o WhatsApp do Diretor Comercial para recuperação do cliente antes de qualquer detração pública.</span>
+      </div>
+    `;
+    logAutonomousAction('ALERTA DIRETORIA', 'Cliente Detrator Detectado', `Nota ${score} disparou alerta urgente para a diretoria intervir e recuperar a negociação.`, 'badge-red');
+  }
+}
+
+// ==========================================================================
+// 13. DEMO DO CICLO AUTÔNOMO COMPLETO (PILOTO AUTOMÁTICO EM AÇÃO)
+// ==========================================================================
+
+function triggerAutonomousCycleDemo() {
+  showToast('⚡ Iniciando demonstração do Ciclo Autônomo do ImobIA...', 'gold');
+
+  // STEP 1: Webhook & Audio Received
+  setTimeout(() => {
+    logAutonomousAction(
+      '1. WEBHOOK META OFICIAL',
+      'Áudio Recebido no WhatsApp',
+      'Compradora "Dra. Luciana Paes" enviou áudio de 28s: "Procuro cobertura em Itaparica até R$ 3.2M com 3 vagas."',
+      'badge-emerald'
+    );
+    showToast('🎙️ [Passo 1/4] Áudio recebido e transcrito com Gemini 2.5 Flash!', 'gold');
+  }, 1000);
+
+  // STEP 2: Automatic Registration
+  setTimeout(() => {
+    const newLead = {
+      id: 'lead-auto-' + Date.now(),
+      name: 'Dra. Luciana Paes',
+      phone: '+55 (27) 99777-8899',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      origin: 'WhatsApp Direto',
+      stage: 'novo',
+      propertyInterest: 'Cobertura Duplex Praia de Itaparica',
+      budget: 3200000,
+      bairros: ['Praia de Itaparica'],
+      suitesDesejadas: 3,
+      vagasDesejadas: 3,
+      formaPagamento: '60% Entrada + Financiamento',
+      urgencia: 'Alta (Mudança 45 dias)',
+      corretor: 'Roberto Mantovani',
+      slaSeconds: 300,
+      lastMsgTime: 'Agora',
+      unreadCount: 0
+    };
+
+    LEADS.unshift(newLead);
+    renderKanbanBoard();
+
+    logAutonomousAction(
+      '2. CADASTRO AUTÔNOMO',
+      'Novo Lead Inserido no VELOX CRM',
+      'Dra. Luciana Paes cadastrada com orçamento de R$ 3.2M e preferência por Itaparica.',
+      'badge-emerald'
+    );
+    showToast('✅ [Passo 2/4] Lead cadastrado automaticamente no CRM!', 'emerald');
+  }, 2200);
+
+  // STEP 3: Automatic Qualification & Kanban Transition
+  setTimeout(() => {
+    const lead = LEADS.find(l => l.name === 'Dra. Luciana Paes');
+    if (lead) {
+      lead.stage = 'qualificado';
+      renderKanbanBoard();
+    }
+
+    logAutonomousAction(
+      '3. TRANSIÇÃO NO PIPELINE',
+      'Avanço para [Qualificado / IA]',
+      'ImobIA validou capacidade de pagamento e moveu Dra. Luciana Paes no Kanban.',
+      'badge-blue'
+    );
+    showToast('📊 [Passo 3/4] ImobIA moveu o lead para "Qualificado / IA" no Kanban!', 'blue');
+  }, 3600);
+
+  // STEP 4: Google Calendar Booking & Stage to Visita Agendada
+  setTimeout(() => {
+    const lead = LEADS.find(l => l.name === 'Dra. Luciana Paes');
+    if (lead) {
+      lead.stage = 'visita-agendada';
+      renderKanbanBoard();
+    }
+
+    logAutonomousAction(
+      '4. GOOGLE CALENDAR & WHATSAPP',
+      'Visita Agendada & Lead em [Visita Agendada]',
+      'Evento agendado para Sábado 11:00 na Cobertura Duplex Itaparica. Rota Waze enviada no WhatsApp da Dra. Luciana.',
+      'badge-purple'
+    );
+    showToast('🎉 [Passo 4/4] Visita agendada no Google Calendar e lead em "Visita Agendada"!', 'emerald');
+  }, 5000);
+}
+
