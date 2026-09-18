@@ -958,6 +958,11 @@
     // Dynamic Conversation State / Memory
     const CONV_STATE = {
       leadName: null,
+      leadContact: null,
+      leadType: null, // 'investimento' | 'moradia'
+      investFocus: null, // 'valorizacao' | 'renda'
+      locationPref: null, // 'frente-mar' | 'segunda-quadra'
+      origin: null, // 'local' | 'remoto'
       activeBairro: null,
       activePropertyId: 'prop-1',
       budgetRange: null,
@@ -966,6 +971,9 @@
       permutaMentioned: false,
       visitProposed: false,
       visitScheduled: false,
+      dossierOffered: false,
+      dossierSent: false,
+      fallbackStep: 0,
       interactionCount: 0,
       history: []
     };
@@ -1116,157 +1124,136 @@
     }
 
     function dispatchConversationalResponse(text, rawText) {
+      const cleanText = (rawText || text || '')
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
       // 1. NEIGHBORHOOD DETECTION
-      const mentionsPraiaDaCosta = text.includes('praia da costa') || text.includes('costa') || text.includes('gil veloso') || text.includes('champagnat') || text.includes('atlantis');
-      const mentionsItaparica = text.includes('itaparica') || text.includes('julio de souza') || text.includes('júlio de souza') || text.includes('sunset');
-      const mentionsItapua = text.includes('itapuã') || text.includes('itapua') || text.includes('hugo musso');
+      const mentionsPraiaDaCosta = cleanText.includes('praia da costa') || cleanText.includes('costa') || cleanText.includes('gil veloso') || cleanText.includes('champagnat') || cleanText.includes('atlantis');
+      const mentionsItaparica = cleanText.includes('itaparica') || cleanText.includes('julio de souza') || cleanText.includes('sunset');
+      const mentionsItapua = cleanText.includes('itapua') || cleanText.includes('hugo musso');
 
       if (mentionsPraiaDaCosta) CONV_STATE.activeBairro = 'praia-da-costa';
       else if (mentionsItaparica) CONV_STATE.activeBairro = 'itaparica';
       else if (mentionsItapua) CONV_STATE.activeBairro = 'itapua';
 
-      // 2. DISAMBIGUATION: DISCOVERY / EXPLORATION VS PHYSICAL VISIT
-      // "conhecer imóveis / conhecer opções / o que tem / ver opções" = CATALOG DISCOVERY (NOT visit scheduling!)
-      const isConhecerOpcoes = text.includes('conhecer im') || text.includes('conhecer op') || text.includes('conhecer os') || text.includes('conhecer o que') || text.includes('gostaria de conhecer') || text.includes('quero conhecer') || text.includes('quais imoveis') || text.includes('quais imóveis');
-      const isConhecerPessoalmente = text.includes('conhecer pessoalmente') || text.includes('conhecer ao vivo') || text.includes('ver pessoalmente') || text.includes('ver ao vivo') || text.includes('visitar pessoalmente');
+      // 2. STEM-BASED QUALIFICATION CRITERIA
+      const mentionsInvestimento = cleanText.includes('invest') || cleanText.includes('rentabil') || cleanText.includes('valoriz') || cleanText.includes('renda') || cleanText.includes('locac') || cleanText.includes('aluguel') || cleanText.includes('patrimon') || cleanText.includes('lucro') || cleanText.includes('retorno') || cleanText.includes('ganho') || cleanText.includes('capital');
+      const mentionsValorizacao = cleanText.includes('valoriz') || cleanText.includes('ganho de capital') || cleanText.includes('patrimon') || cleanText.includes('lucro') || cleanText.includes('apreci');
+      const mentionsRenda = cleanText.includes('renda') || cleanText.includes('locac') || cleanText.includes('aluguel') || cleanText.includes('airbnb') || cleanText.includes('dividend');
+      const mentionsMoradia = cleanText.includes('morad') || cleanText.includes('morar') || cleanText.includes('familia') || cleanText.includes('resid') || cleanText.includes('mudan');
+      
+      // Strict beachfront phrases so 'Praia da Costa' doesn't falsely trigger frente mar
+      const mentionsFrenteMar = cleanText.includes('frente mar') || cleanText.includes('frente a praia') || cleanText.includes('frente praia') || cleanText.includes('pe na areia') || cleanText.includes('beira mar') || cleanText.includes('vista mar') || cleanText.includes('orla') || cleanText.includes('gil veloso') || cleanText.includes('em frente');
+      const mentionsSegundaQuadra = cleanText.includes('segunda quadra') || cleanText.includes('2 quadra') || cleanText.includes('2a quadra') || cleanText.includes('champagnat') || cleanText.includes('reservad');
 
-      // 3. EXPLICIT VISIT INTENT
-      const explicitVisitKeywords = [
-        'agendar visita', 'marcar visita', 'visita presencial', 'visitar pessoalmente',
-        'quero visitar', 'gostaria de visitar', 'podemos visitar', 'quando posso visitar',
-        'agendar uma visita', 'marcar uma visita', 'ir ao local', 'ir até o local', 'ir ate o local',
-        'agendar horario', 'agendar horário', 'marcar horario', 'marcar horário', 'marcar um horário', 'marcar um horario'
-      ];
-      const hasExplicitVisitKeyword = explicitVisitKeywords.some(kw => text.includes(kw)) || isConhecerPessoalmente;
-      const mentionsVisitGeneric = (text.includes('visita') || text.includes('visitar')) && !isConhecerOpcoes;
+      // Origin Detection
+      const mentionsOriginRemote = cleanText.includes('fora') || cleanText.includes('outro estado') || cleanText.includes('outra cidade') || cleanText.includes('sao paulo') || cleanText.includes('sp') || cleanText.includes('rio') || cleanText.includes('rj') || cleanText.includes('minas') || cleanText.includes('mg') || cleanText.includes('brasilia') || cleanText.includes('df') || cleanText.includes('exterior') || cleanText.includes('eua') || cleanText.includes('nao moro');
+      const mentionsOriginLocal = cleanText.includes('moro aqui') || cleanText.includes('sou daqui') || cleanText.includes('local') || cleanText.includes('vila velha') || cleanText.includes('vitoria') || cleanText.includes('capixaba') || cleanText.includes('espirito santo') || cleanText.includes('aqui no estado') || cleanText.includes('resido aqui');
 
-      // Check day / time mention
-      const hasDayOrTime = text.includes('sabado') || text.includes('sábado') || text.includes('domingo') || text.includes('sexta') || text.includes('amanha') || text.includes('amanhã') || text.includes('hoje') || text.includes('10h') || text.includes('15h') || text.includes('16h') || text.includes('de manha') || text.includes('de manhã') || text.includes('a tarde') || text.includes('à tarde');
+      // Contact Info & Dossier Intent
+      const emailMatch = rawText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const phoneMatch = rawText.match(/(?:\(?\d{2}\)?\s*)?(?:9\s*)?\d{4,5}[-\s]?\d{4}/);
+      const hasContactDetails = emailMatch || phoneMatch || cleanText.includes('meu nome') || cleanText.includes('sou o ') || cleanText.includes('sou a ') || (CONV_STATE.dossierOffered && cleanText.length > 5 && (cleanText.includes('@') || /\d{5,}/.test(cleanText) || cleanText.includes('carlos') || cleanText.includes('eduardo')));
+      const wantsDossierOrMaterial = cleanText.includes('dossie') || cleanText.includes('material') || cleanText.includes('pdf') || cleanText.includes('estudo') || cleanText.includes('mandar') || cleanText.includes('manda') || cleanText.includes('envia') || cleanText.includes('enviar') || (CONV_STATE.dossierOffered && (cleanText.includes('pode') || cleanText.includes('sim') || cleanText.includes('quero') || cleanText.includes('por favor') || cleanText.includes('ok')));
 
-      // User accepting a previously proposed visit appointment or specifying day/time
-      const isAcceptingProposedVisit = (CONV_STATE.visitProposed || CONV_STATE.familyMentioned || CONV_STATE.activePropertyId) && hasDayOrTime && 
-        (text.includes('pode ser') || text.includes('combinado') || text.includes('fechado') || text.includes('vamos marcar') || text.includes('vamos agendar') || text.includes('quero') || text.includes('perfeito') || text.includes('sabado') || text.includes('sábado') || text.includes('domingo') || text.includes('sexta') || text.includes('10h') || text.includes('15h') || text.includes('16h') || text.includes('prefiro'));
+      // Inquiries & Objections
+      const isConhecerOpcoes = cleanText.includes('conhecer im') || cleanText.includes('conhecer op') || cleanText.includes('conhecer os') || cleanText.includes('conhecer o que') || cleanText.includes('gostaria de conhecer') || cleanText.includes('quero conhecer') || cleanText.includes('quais imoveis') || cleanText.includes('quais') || cleanText.includes('disponiv') || cleanText.includes('opcoes') || cleanText.includes('catalogo') || cleanText.includes('listar');
+      const isConhecerPessoalmente = cleanText.includes('conhecer pessoalmente') || cleanText.includes('conhecer ao vivo') || cleanText.includes('ver pessoalmente') || cleanText.includes('ver ao vivo') || cleanText.includes('visitar pessoalmente');
+      const explicitVisitKeywords = ['agendar visita', 'marcar visita', 'visita presencial', 'visitar pessoalmente', 'quero visitar', 'gostaria de visitar', 'podemos visitar', 'quando posso visitar', 'agendar horario', 'marcar horario'];
+      const hasExplicitVisitKeyword = explicitVisitKeywords.some(kw => cleanText.includes(kw)) || isConhecerPessoalmente;
+      const mentionsVisitGeneric = (cleanText.includes('visita') || cleanText.includes('visitar')) && !isConhecerOpcoes;
+      const hasDayOrTime = cleanText.includes('sabado') || cleanText.includes('domingo') || cleanText.includes('sexta') || cleanText.includes('amanha') || cleanText.includes('hoje') || cleanText.includes('10h') || cleanText.includes('15h') || cleanText.includes('16h') || cleanText.includes('manha') || cleanText.includes('tarde');
+      const isAcceptingProposedVisit = (CONV_STATE.visitProposed || CONV_STATE.familyMentioned || CONV_STATE.activePropertyId) && hasDayOrTime && (cleanText.includes('pode ser') || cleanText.includes('combinado') || cleanText.includes('fechado') || cleanText.includes('vamos marcar') || cleanText.includes('quero') || cleanText.includes('perfeito') || cleanText.includes('sabado') || cleanText.includes('domingo') || cleanText.includes('sexta') || cleanText.includes('10h') || cleanText.includes('15h') || cleanText.includes('16h'));
 
-      // Complete visit booking intent (triggers calendar card)
       const shouldBookVisitNow = (hasExplicitVisitKeyword && hasDayOrTime) || isAcceptingProposedVisit;
-
-      // Incomplete visit request (needs day/time proposal)
       const shouldProposeVisit = (hasExplicitVisitKeyword || (mentionsVisitGeneric && !hasDayOrTime)) && !shouldBookVisitNow;
 
-      // 4. OBJECTIONS & CONCERNS
-      const isObjectionCondo = text.includes('condominio caro') || text.includes('condomínio caro') || text.includes('condominio alto') || text.includes('condomínio alto') || text.includes('caro o condominio') || text.includes('caro o condomínio') || text.includes('taxa de condominio alta') || text.includes('muito caro esse condominio') || text.includes('taxa alta');
-      const isObjectionPrice = text.includes('ta caro') || text.includes('tá caro') || text.includes('muito caro') || text.includes('desconto') || text.includes('abaixa') || text.includes('proposta mais baixa') || text.includes('menor valor') || text.includes('desconto a vista') || text.includes('desconto à vista');
-      const isObjectionConjuge = text.includes('esposa') || text.includes('marido') || text.includes('mulher') || text.includes('conjuge') || text.includes('cônjuge') || text.includes('falar com minha') || text.includes('falar com meu');
-      const isCuriousJustLooking = text.includes('so olhando') || text.includes('só olhando') || text.includes('so pesquisando') || text.includes('só pesquisando') || text.includes('curioso') || text.includes('sem pressa') || text.includes('so uma olhadinha') || text.includes('só uma olhadinha');
+      const isObjectionCondo = cleanText.includes('condominio caro') || cleanText.includes('condominio alto') || cleanText.includes('caro o condominio') || cleanText.includes('taxa alta');
+      const isObjectionPrice = cleanText.includes('ta caro') || cleanText.includes('muito caro') || cleanText.includes('desconto') || cleanText.includes('abaixa') || cleanText.includes('proposta mais baixa');
+      const isObjectionConjuge = cleanText.includes('esposa') || cleanText.includes('marido') || cleanText.includes('mulher') || cleanText.includes('conjuge') || cleanText.includes('falar com minha') || cleanText.includes('falar com meu');
+      const isCuriousJustLooking = cleanText.includes('so olhando') || cleanText.includes('so pesquisando') || cleanText.includes('curioso') || cleanText.includes('sem pressa');
 
-      // 5. SPECIFIC INQUIRIES
-      const asksCondoIptu = (text.includes('condominio') || text.includes('condomínio') || text.includes('iptu') || text.includes('taxa') || text.includes('custo') || text.includes('manutencao') || text.includes('manutenção')) && !isObjectionCondo;
-      const asksPermuta = text.includes('permuta') || text.includes('troca') || text.includes('pega imovel') || text.includes('pega imóvel') || text.includes('apto menor') || text.includes('apartamento menor') || text.includes('carro') || text.includes('dação');
-      const asksFinanciamento = text.includes('financi') || text.includes('caixa') || text.includes('banco') || text.includes('parcela') || text.includes('entrada') || text.includes('sac') || text.includes('price') || text.includes('juros');
-      const asksPet = text.includes('pet') || text.includes('cachorro') || text.includes('labrador') || text.includes('animal') || text.includes('animais') || text.includes('gato');
-      const asksGaragem = text.includes('vaga') || text.includes('garagem') || text.includes('carro') || text.includes('suv') || text.includes('veiculo') || text.includes('veículo');
-      const asksQuartos = text.includes('quarto') || text.includes('suite') || text.includes('suíte') || text.includes('4 quartos') || text.includes('3 quartos') || text.includes('metragem') || text.includes('planta') || text.includes('tamanho') || text.includes('m2') || text.includes('área');
-      const asksFotos = text.includes('foto') || text.includes('fotos') || text.includes('imagem') || text.includes('imagens') || text.includes('video') || text.includes('vídeo') || text.includes('tour') || text.includes('ver fotos');
-      const asksDisponiveis = text.includes('quais') || text.includes('disponiv') || text.includes('tem dispon') || text.includes('opcoes') || text.includes('opções') || text.includes('o que tem') || text.includes('o que voce tem') || text.includes('o que você tem') || text.includes('mostrar') || text.includes('mostra') || text.includes('catalogo') || text.includes('catálogo') || text.includes('listar') || text.includes('lista') || text.includes('ver imoveis');
-      const asksCumprimento = text.startsWith('ola') || text.startsWith('olá') || text.startsWith('oi') || text.startsWith('bom dia') || text.startsWith('boa tarde') || text.startsWith('boa noite') || text === 'ola' || text === 'olá' || text === 'oi';
-      const asksAgradecimento = text.includes('obrigad') || text.includes('valeu') || text.includes('perfeito') || text.includes('maravilha') || text.includes('combinado') || text.includes('otimo') || text.includes('ótimo');
+      const asksCondoIptu = (cleanText.includes('condominio') || cleanText.includes('iptu') || cleanText.includes('taxa') || cleanText.includes('custo')) && !isObjectionCondo;
+      const asksPermuta = cleanText.includes('permuta') || cleanText.includes('troca') || cleanText.includes('pega imovel') || cleanText.includes('apto menor');
+      const asksFinanciamento = cleanText.includes('financi') || cleanText.includes('caixa') || cleanText.includes('banco') || cleanText.includes('parcela') || cleanText.includes('entrada');
+      const asksPet = cleanText.includes('pet') || cleanText.includes('cachorro') || cleanText.includes('animal') || cleanText.includes('animais') || cleanText.includes('gato');
+      const asksGaragem = cleanText.includes('vaga') || cleanText.includes('garagem') || cleanText.includes('carro') || cleanText.includes('veiculo');
+      const asksQuartos = cleanText.includes('quarto') || cleanText.includes('suite') || cleanText.includes('metragem') || cleanText.includes('planta') || cleanText.includes('m2');
+      const asksFotos = cleanText.includes('foto') || cleanText.includes('imagem') || cleanText.includes('video') || cleanText.includes('tour');
+      const asksCumprimento = cleanText.startsWith('ola') || cleanText.startsWith('oi') || cleanText.startsWith('bom dia') || cleanText.startsWith('boa tarde') || cleanText.startsWith('boa noite') || cleanText === 'ola' || cleanText === 'oi';
+      const asksAgradecimento = cleanText.includes('obrigad') || cleanText.includes('valeu') || cleanText.includes('perfeito') || cleanText.includes('maravilha') || cleanText.includes('combinado');
 
-      // 6. LIFESTYLE / OBJECTIVE QUALIFICATION REPLIES
-      const mentionsMoradia = text.includes('moradia') || text.includes('morar') || text.includes('minha familia') || text.includes('minha família') || text.includes('residencial') || text.includes('para morar');
-      const mentionsInvestimento = text.includes('investimento') || text.includes('investir') || text.includes('rentabilidade') || text.includes('locacao') || text.includes('locação') || text.includes('renda');
-      const mentionsFrenteMar = text.includes('frente mar') || text.includes('pe na areia') || text.includes('pé na areia') || text.includes('beira mar') || text.includes('vista mar');
-      const mentionsSegundaQuadra = text.includes('segunda quadra') || text.includes('2 quadra') || text.includes('2ª quadra') || text.includes('champagnat') || text.includes('reservad');
-
-      // 7. GATE PASS VISITOR DATA
-      const mentionsPlateOrName = (text.includes('placa') || text.includes('carro') || text.includes('modelo') || text.includes('meu nome') || text.includes('sou o') || text.includes('sou a')) && CONV_STATE.visitScheduled;
+      const mentionsPlateOrName = (cleanText.includes('placa') || cleanText.includes('carro') || cleanText.includes('modelo') || cleanText.includes('sou o') || cleanText.includes('sou a')) && CONV_STATE.visitScheduled;
 
       // -------------------------------------------------------------
       // DISPATCH SEQUENCE
       // -------------------------------------------------------------
 
-      // 1. GATE PASS / VISITOR REGISTRATION
+      // 1. GATE PASS VISITOR REGISTRATION
       if (mentionsPlateOrName) {
         appendAgentMessage(`
-          Perfeito! Dados de identificação registrados com sucesso na segurança predial.
+          Perfeito! Dados de identificação registrados na portaria predial.
           <br><br>
-          O seu acesso e vaga de visitante nº 41 no subsolo já estão <strong>100% liberados</strong> para o dia da visita.
-          <br><br>
-          O corretor <strong>Roberto Mantovani</strong> enviará uma mensagem de confirmação no seu WhatsApp 1 hora antes do horário marcado para recebê-lo pessoalmente na recepção.
-          <br><br>
-          Estamos muito felizes em apresentar essa joia imobiliária para você e sua família!
+          Sua vaga de visitante nº 41 no subsolo já está <strong>100% liberada</strong>. O corretor <strong>Roberto Mantovani</strong> enviará uma mensagem de confirmação 1 hora antes para recebê-lo na recepção.
         `);
-        addAuditLog('ACESSO LIBERADO', 'Portaria e Vaga de Visitante Autorizadas', 'Dados de visitante e veículo sincronizados com a portaria blindada do condomínio.');
+        addAuditLog('ACESSO LIBERADO', 'Portaria e Vaga de Visitante Autorizadas', 'Dados sincronizados com a portaria blindada.');
         return;
       }
 
-      // 2. OBJECTIONS (GUILHERME MACHADO & SOTHEBY'S)
-      if (isObjectionCondo) {
+      // 2. CONTACT RECEIVED (DELIVER DOSSIER / CONFIRM LEAD TRANSFER)
+      if (CONV_STATE.dossierOffered && hasContactDetails && !CONV_STATE.dossierSent) {
+        CONV_STATE.dossierSent = true;
+        const contactName = emailMatch ? rawText.split(',')[0].trim() : 'Prezado investidor';
         appendAgentMessage(`
-          Compreendo perfeitamente a sua ponderação, e transparência financeira é inegociável para nós aqui na Velox.
+          Pronto, ${contactName}! Dossiê Executivo liberado com sucesso.
           <br><br>
-          No entanto, quando colocamos o demonstrativo na ponta do lápis: esse valor de <strong>R$ 2.450/mês</strong> na Mansão Frente Mar já contempla portaria 24h blindada, equipe própria de zeladoria e segurança armada, consumo integral de água e um <strong>lazer de clube estilo resort</strong> (piscina aquecida semiolímpica, academia climatizada com aparelhos Life Fitness, sauna úmida e salão de festas privativo).
-          <br><br>
-          Para uma família, manter títulos em clubes privados e segurança individualizada custaria mais do que o dobro, sem a comodidade de descer pelo elevador da sua própria residência.
-          <br><br>
-          Essa conveniência de segurança máxima e estrutura de clube privativo para a sua família faz sentido no seu estilo de vida?
+          <div class="calendar-event-card" style="border-color: var(--gold-primary);">
+            <div class="cal-title-row" style="color: var(--gold-primary);">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Dossiê Executivo: Mansão Frente Mar (PDF + Vídeo 4K)</span>
+            </div>
+            <div class="cal-meta-row">
+              📊 <strong>Estudo de Mercado:</strong> Valorização m² (+14% a.a.) & Liquidez<br>
+              🏢 <strong>Planta & Acervo:</strong> 400m² privativos + Tour Aéreo 4K<br>
+              👤 <strong>Corretor Responsável:</strong> Roberto Mantovani (Top Producer)
+            </div>
+            <div class="cal-button-group">
+              <a href="#" onclick="alert('Download do Dossiê Executivo (PDF + Vídeo 4K) iniciado!'); return false;" class="cal-btn cal-btn-google">
+                <i class="fa-solid fa-download"></i> Baixar Dossiê PDF
+              </a>
+              <a href="https://wa.me/5527999999999?text=Ol%C3%A1%20Roberto,%20recebi%20o%20dossi%C3%AA%20da%20Mans%C3%A3o%20Frente%20Mar" target="_blank" class="cal-btn cal-btn-waze">
+                <i class="fa-brands fa-whatsapp"></i> Falar com Roberto
+              </a>
+            </div>
+          </div>
+          Nosso corretor sênior <strong>Roberto Mantovani</strong> já recebeu suas preferências e entrará em contato em instantes para tirar qualquer dúvida de rentabilidade ou agendar uma apresentação privativa!
         `);
-        addAuditLog('QUEBRA DE OBJEÇÃO', 'Acolhimento de Taxa Condominial', 'ImobIA ressignificou o condomínio demonstrando valor de clube resort e segurança 24h.');
+        addAuditLog('DOSSIÊ ENVIADO', 'Lead Qualificado como Investidor Frente Mar', `Dossiê executivo enviado para ${rawText}. Transbordo para Roberto Mantovani registrado.`);
         return;
       }
 
-      if (isObjectionPrice) {
+      // 3. DOSSIER / MATERIAL EXPLICITLY REQUESTED
+      if (wantsDossierOrMaterial && (CONV_STATE.leadType === 'investimento' || CONV_STATE.dossierOffered || mentionsInvestimento)) {
+        CONV_STATE.dossierOffered = true;
         appendAgentMessage(`
-          Entendo perfeitamente a sua busca por máxima eficiência e inteligência no investimento imobiliário!
-          <br><br>
-          Na orla da Praia da Costa, especificamente na Av. Antônio Gil Veloso, os imóveis frente mar com sol da manhã definitivo têm valorização média histórica de <strong>+14% ao ano</strong>, decorrente da escassez física absoluta de novos terrenos para construção na orla.
-          <br><br>
-          O proprietário é flexível e está aberto a analisar uma proposta comercial estruturada para liquidação à vista ou carta de crédito bancária rápida.
-          <br><br>
-          O que você acha de visitarmos a unidade no sábado para você sentir a acústica, a vista panorâmica e, se o imóvel fizer os seus olhos brilharem, formatarmos juntos uma proposta formal para a diretoria?
+          Excelente! Para eu liberar seu acesso seguro ao <strong>Dossiê Executivo da Mansão Frente Mar</strong> com o estudo completo de valorização e rentabilidade, qual é o seu <strong>nome completo</strong> e o seu melhor <strong>e-mail ou WhatsApp</strong>?
         `);
-        addAuditLog('QUEBRA DE OBJEÇÃO', 'Defesa de Valor de Metro Quadrado', 'ImobIA apresentou valorização de 14% a.a. e abriu canal de proposta formal.');
+        addAuditLog('SOLICITAÇÃO DE DOSSIÊ', 'Aguardando Contato do Investidor', 'ImobIA solicitou nome e contato para envio seguro do estudo executivo.');
         return;
       }
 
-      if (isObjectionConjuge) {
-        appendAgentMessage(`
-          Excelente! A escolha de um novo lar é uma decisão 100% familiar e a percepção dela(e) é a mais importante de todas.
-          <br><br>
-          Inclusive, fazemos questão que vocês conheçam o imóvel juntos, para sentirem ao vivo a iluminação natural da suíte master, o espaço do closet e a ventilação cruzada da varanda sobre o mar.
-          <br><br>
-          Para acomodar a rotina de vocês sem correria: fica mais confortável um horário no <strong>Sábado às 10h da manhã</strong> ou no <strong>início da tarde às 15h</strong>?
-        `);
-        CONV_STATE.visitProposed = true;
-        addAuditLog('CONVITE CONSULTIVO', 'Inclusão de Decisores Familiares', 'ImobIA propôs visita conjunta para alinhamento de decisão familiar.');
-        return;
-      }
-
-      if (isCuriousJustLooking) {
-        appendAgentMessage(`
-          Maravilha! O melhor momento para mapear o mercado é exatamente agora, com serenidade, análise criteriosa e sem nenhuma pressão comercial.
-          <br><br>
-          Além dos imóveis que estão divulgados, a Velox mantém uma carteira confidencial <strong>off-market</strong> (unidades de alto padrão cujos proprietários exigem discrição total e não autorizam anúncio em portais).
-          <br><br>
-          Se surgir uma oportunidade rara na Praia da Costa com sol da manhã e valor de ocasião antes de ir ao mercado aberto, você gostaria que eu te avisasse em primeira mão por aqui?
-        `);
-        addAuditLog('CARTEIRA OFF-MARKET', 'Cliente Adicionado a Radar Secreto', 'ImobIA ativou gatilho de curadoria confidencial sem pressão de venda.');
-        return;
-      }
-
-      // 3. VISIT CONFIRMATION (CALENDAR + WAZE CARD)
+      // 4. VISIT BOOKING (CALENDAR & WAZE)
       if (shouldBookVisitNow) {
         CONV_STATE.visitScheduled = true;
         CONV_STATE.visitProposed = false;
-        const targetDay = text.includes('domingo') ? 'Domingo (21/09)' : 
-                          text.includes('sexta') ? 'Sexta-feira (19/09)' : 'Sábado (20/09)';
-        const targetTime = text.includes('15') || text.includes('16') || text.includes('tarde') ? '15:00' : '10:00';
+        const targetDay = cleanText.includes('domingo') ? 'Domingo (21/09)' : cleanText.includes('sexta') ? 'Sexta-feira (19/09)' : 'Sábado (20/09)';
+        const targetTime = cleanText.includes('15') || cleanText.includes('16') || cleanText.includes('tarde') ? '15:00' : '10:00';
 
         appendAgentMessage(`
-          Excelente escolha! O agendamento presencial é o melhor momento para sentir a iluminação natural, a brisa do mar e a acústica do apartamento.
-          <br><br>
-          O corretor sênior <strong>Roberto Mantovani</strong> estará pessoalmente na portaria para acompanhar vocês e apresentar cada detalhe do condomínio.
-          <br><br>
-          Acabei de pré-bloquear o horário na agenda oficial da imobiliária:
+          Excelente escolha! Agendamento pré-bloqueado na agenda oficial da Velox:
           
           <div class="calendar-event-card">
             <div class="cal-title-row">
@@ -1290,150 +1277,217 @@
 
           Para eu deixar o acesso da portaria 100% liberado sem burocracia, qual é o seu <strong>nome completo</strong> e o modelo/placa do veículo?
         `);
-
-        addAuditLog('GOOGLE CALENDAR API', `Visita Agendada: ${targetDay} às ${targetTime}`, 'Evento criado no Google Calendar com rota Waze. Pipeline movido para [Visita Agendada].');
+        addAuditLog('GOOGLE CALENDAR API', `Visita Agendada: ${targetDay} às ${targetTime}`, 'Evento criado no Google Calendar com Roberto Mantovani.');
         return;
       }
 
-      // 4. VISIT PROPOSAL (DOUBLE ALTERNATIVE CLOSING)
+      // 5. VISIT PROPOSAL (DOUBLE ALTERNATIVE)
       if (shouldProposeVisit) {
         CONV_STATE.visitProposed = true;
         appendAgentMessage(`
-          Com certeza! O agendamento presencial é a melhor forma de sentir a acústica, a ventilação cruzada e a incidência solar do imóvel ao vivo.
+          Com certeza! O agendamento presencial é a melhor forma de sentir a acústica, a brisa e a iluminação ao vivo.
           <br><br>
-          Nosso consultor sênior <strong>Roberto Mantovani</strong> acompanhará você e sua família com atendimento privativo e reservado.
-          <br><br>
-          Para encaixar confortavelmente na sua rotina: fica melhor para você <strong>nesta sexta-feira às 16h</strong> ou no <strong>sábado às 10h da manhã</strong>?
+          Nosso consultor sênior <strong>Roberto Mantovani</strong> acompanhará você com atendimento privativo. Fica melhor para você <strong>nesta sexta às 16h</strong> ou no <strong>sábado às 10h</strong>?
         `);
-        addAuditLog('FECHAMENTO CONSULTIVO', 'Dupla Alternativa Proposta', 'ImobIA ofereceu horários alternativos (Sexta 16h ou Sábado 10h).');
+        addAuditLog('FECHAMENTO CONSULTIVO', 'Dupla Alternativa Proposta', 'ImobIA ofereceu Sexta 16h ou Sábado 10h.');
         return;
       }
 
-      // 5. LIFESTYLE / OBJECTIVE QUALIFICATION FOLLOW-UP
-      if (mentionsMoradia || (mentionsFrenteMar && CONV_STATE.activeBairro === 'praia-da-costa')) {
+      // 6. INITIAL DISCOVERY: PRAIA DA COSTA (Before generic moradia so it welcomes first)
+      if (mentionsPraiaDaCosta && !CONV_STATE.leadType && !isConhecerOpcoes && !mentionsMoradia && !mentionsInvestimento) {
+        CONV_STATE.activeBairro = 'praia-da-costa';
+        appendAgentMessage(`
+          Excelente escolha! A <strong>Praia da Costa</strong> é a região mais nobre e valorizada de Vila Velha.
+          <br><br>
+          Para eu selecionar com precisão: você busca para <strong>moradia da família</strong> ou <strong>investimento</strong>? E prefere <strong>frente mar definitiva</strong> ou <strong>2ª quadra mais reservada</strong>?
+        `);
+        addAuditLog('ACOLHIMENTO INICIAL', 'Praia da Costa Selecionada', 'ImobIA acolheu o lead com elegância e abriu qualificação consultiva.');
+        return;
+      }
+
+      // 7. INITIAL DISCOVERY: ITAPARICA
+      if (mentionsItaparica && !CONV_STATE.leadType && !isConhecerOpcoes) {
+        CONV_STATE.activeBairro = 'itaparica';
+        appendAgentMessage(`
+          Excelente escolha! A <strong>Praia de Itaparica</strong> é a orla que mais valoriza em Vila Velha (+14% a.a.).
+          <br><br>
+          Você busca para <strong>moradia</strong> ou <strong>investimento</strong>? E prefere a exclusividade de uma <strong>cobertura duplex</strong> ou apartamento tipo frente mar?
+        `);
+        addAuditLog('ACOLHIMENTO INICIAL', 'Itaparica Selecionada', 'ImobIA acolheu o lead para Itaparica.');
+        return;
+      }
+
+      // 8. INITIAL DISCOVERY: ITAPUÃ
+      if (mentionsItapua && !CONV_STATE.leadType && !isConhecerOpcoes) {
+        CONV_STATE.activeBairro = 'itapua';
+        appendAgentMessage(`
+          A <strong>Praia de Itapuã</strong> é perfeita para fazer tudo a pé e curtir o polo gastronômico da Hugo Musso.
+          <br><br>
+          Temos unidades de alto padrão prontas para morar. Você busca imóvel para mudança imediata ou estuda opções para personalizar?
+        `);
+        addAuditLog('ACOLHIMENTO INICIAL', 'Itapuã Selecionada', 'ImobIA acolheu o lead para Itapuã.');
+        return;
+      }
+
+      // 9. INVESTOR STEP 1: OBJECTIVE SELECTION (VALORIZAÇÃO OU RENDA)
+      if (CONV_STATE.leadType === 'investimento' && !CONV_STATE.investFocus && (mentionsValorizacao || mentionsRenda)) {
+        CONV_STATE.investFocus = mentionsValorizacao ? 'valorizacao' : 'renda';
+        appendAgentMessage(`
+          Perfeito! Para valorização máxima, o destaque absoluto é a <strong>Mansão Frente Mar (Gil Veloso)</strong>, além de unidades a partir de R$ 1.95M.
+          <br><br>
+          Para eu calibrar o atendimento: você reside aqui no Espírito Santo ou mora em outro estado/país?
+        `);
+        addAuditLog('QUALIFICAÇÃO INVESTIDOR', 'Ganho de Capital Selecionado', 'Mapeando origem do investidor (local vs remoto).');
+        return;
+      }
+
+      // 10. INVESTOR STEP 2: NEXT STEP OFFER (DOSSIÊ EXECUTIVO VS BROKER CONSULTATION)
+      if (CONV_STATE.leadType === 'investimento' && CONV_STATE.investFocus && !CONV_STATE.dossierOffered) {
+        CONV_STATE.dossierOffered = true;
+        if (mentionsOriginRemote) CONV_STATE.origin = 'remoto';
+        else if (mentionsOriginLocal) CONV_STATE.origin = 'local';
+
+        appendAgentMessage(`
+          Compreendido perfeitamente! Como investidor focado em frente mar, a prioridade são números consolidados e liquidez.
+          <br><br>
+          Nós preparamos um <strong>Dossiê Executivo</strong> completo (PDF com estudo de m², histórico de valorização dos últimos 3 anos e vídeo tour em 4K).
+          <br><br>
+          Posso te enviar o material por aqui ou prefere que o nosso corretor sênior <strong>Roberto Mantovani</strong> faça uma apresentação rápida dos números?
+        `);
+        addAuditLog('QUALIFICAÇÃO INVESTIDOR', 'Foco em Valorização Frente Mar', 'Oferecido Dossiê Executivo (PDF + Tour 4K) ou contato com Roberto Mantovani.');
+        return;
+      }
+
+      // 11. INVESTOR CORE ENTRY: INITIAL INVESTMENT MENTION
+      if (mentionsInvestimento && !CONV_STATE.leadType) {
+        CONV_STATE.leadType = 'investimento';
+        if (mentionsFrenteMar) CONV_STATE.locationPref = 'frente-mar';
+
+        appendAgentMessage(`
+          Excelente visão estratégica! Na orla da Praia da Costa, os imóveis frente mar têm valorização histórica média de <strong>+14% ao ano</strong> pela escassez de terrenos.
+          <br><br>
+          O seu foco principal é <strong>ganho de capital na valorização do m²</strong> ou <strong>geração de renda com locação</strong>?
+        `);
+        addAuditLog('QUALIFICAÇÃO PERFIL', 'Investimento Selecionado', 'ImobIA destacou valorização de +14% a.a. e abriu qualificação de objetivo (ganho vs renda).');
+        return;
+      }
+
+      // 12. MORADIA QUALIFICATION
+      if (mentionsMoradia || (mentionsFrenteMar && CONV_STATE.activeBairro === 'praia-da-costa' && !CONV_STATE.leadType)) {
+        CONV_STATE.leadType = 'moradia';
         CONV_STATE.familyMentioned = true;
         const props = PORTFOLIO_DB['praia-da-costa'];
         appendAgentMessage(`
-          Perfeito! Para moradia familiar com alto padrão de vida e localização frente mar definitiva, temos uma verdadeira joia na <strong>Av. Antônio Gil Veloso</strong>:
-          <br><br>
-          É a <strong>Mansão Frente Mar</strong>: são 400m² privativos, 4 suítes plenas (master com banheira de imersão debruçada no mar), living de 120m² integrado à varanda panorâmica e 4 vagas livres soltas no subsolo.
-          <br><br>
-          O condomínio conta com lazer resort completo e portaria blindada com segurança armada 24h.
+          Perfeito! Para moradia familiar com alto padrão de vida e localização frente mar definitiva, o destaque é a <strong>Mansão Frente Mar</strong> na Av. Antônio Gil Veloso (400m², 4 suítes, 4 vagas livres e lazer resort).
           ${renderPropertyMiniCard(props[0])}
-          Esse perfil de metragem e vista atende ao que a sua família procura? Se quiser, posso te passar os custos de condomínio e IPTU, ou agendarmos um horário para você conhecer pessoalmente!
+          Gostaria de conhecer os custos de condomínio e IPTU ou prefere agendar uma visita presencial?
         `);
-        addAuditLog('QUALIFICAÇÃO PERFIL', 'Aderência: Moradia Frente Mar', 'Lead direcionado para Mansão Frente Mar (R$ 3.8M). Mini-card apresentado.');
-        return;
-      }
-
-      if (mentionsInvestimento) {
-        appendAgentMessage(`
-          Excelente visão estratégica! A orla de Vila Velha registra valorização constante de <strong>+14% ao ano</strong> pela escassez física de novos terrenos frente mar.
-          <br><br>
-          Para investimento no bairro, temos dois perfis de destaque:
-          <br><br>
-          • <strong>Geração de Renda & Alta Liquidez:</strong> O <strong>Edifício Atlantis (R$ 1.95M)</strong> tem condomínio enxuto (R$ 1.100/mês) e altíssima procura para locação executiva de luxo.<br>
-          • <strong>Preservação Patrimonial (*Trophy Asset*):</strong> A <strong>Mansão Frente Mar (R$ 3.8M)</strong> na Gil Veloso, ativo raro com proteção inflacionária.
-          <br><br>
-          O seu foco principal é <strong>gerar renda mensal com aluguel</strong> ou <strong>ganho de capital na valorização do metro quadrado</strong>?
-        `);
-        addAuditLog('QUALIFICAÇÃO PERFIL', 'Investimento & Valorização', 'Apresentadas opções de renda (Ed. Atlantis) e ganho patrimonial (Mansão Frente Mar).');
+        addAuditLog('QUALIFICAÇÃO PERFIL', 'Moradia Frente Mar', 'Apresentada Mansão Frente Mar para moradia familiar.');
         return;
       }
 
       if (mentionsSegundaQuadra) {
         const props = PORTFOLIO_DB['praia-da-costa'];
         appendAgentMessage(`
-          Uma escolha muito inteligente! A 2ª quadra da Praia da Costa, especialmente na região nobre da Champagnat, alia sofisticação a uma atmosfera mais silenciosa, arborizada e reservada.
+          Uma escolha muito inteligente! A 2ª quadra da Praia da Costa alia sofisticação a uma atmosfera mais arborizada e reservada.
           <br><br>
-          Temos duas opções com esse perfil:
-          <br><br>
-          • <strong>Residência Gourmet (Champagnat):</strong> 260m², 4 suítes, 3 vagas, marcenaria Todeschini impecável — <em>R$ 2.850.000</em>.<br>
-          • <strong>Edifício Atlantis (2ª Quadra):</strong> 180m², 3 suítes, clube resort privativo — <em>R$ 1.950.000</em>.
+          Temos a <strong>Residência Gourmet (260m² - R$ 2.85M)</strong> e o <strong>Edifício Atlantis (180m² - R$ 1.95M)</strong>.
           ${renderPropertyMiniCard(props[1])}
           Qual dessas metragens é mais confortável para a rotina de vocês?
         `);
-        addAuditLog('QUALIFICAÇÃO PERFIL', '2ª Quadra / Champagnat', 'Apresentadas opções na região nobre da Champagnat.');
         return;
       }
 
-      // 6. SPECIFIC INQUIRIES
+      // 13. OBJECTIONS & INQUIRIES (CONCISE)
+      if (isObjectionCondo) {
+        appendAgentMessage(`
+          Compreendo sua ponderação! Na Mansão Frente Mar, a taxa de R$ 2.450 já contempla água, segurança armada 24h e um lazer de resort completo (academia Life Fitness e piscina aquecida).
+          <br><br>
+          Essa comodidade e segurança para a família fazem sentido para vocês?
+        `);
+        addAuditLog('QUEBRA DE OBJEÇÃO', 'Acolhimento de Condomínio', 'ImobIA demonstrou valor agregado de resort privativo.');
+        return;
+      }
+
+      if (isObjectionPrice) {
+        appendAgentMessage(`
+          Entendo sua busca pelo melhor negócio! Na Gil Veloso, os imóveis frente mar têm valorização de +14% a.a. pela escassez de terrenos na orla.
+          <br><br>
+          O proprietário analisa propostas comerciais para liquidação rápida. Vale a pena conhecermos o imóvel no sábado para você avaliar e formatarmos uma proposta?
+        `);
+        return;
+      }
+
+      if (isObjectionConjuge) {
+        appendAgentMessage(`
+          Excelente! A escolha do novo lar é uma decisão familiar e a percepção dela(e) é fundamental.
+          <br><br>
+          Fazemos questão de apresentar para vocês juntos. Fica mais confortável no sábado às 10h da manhã ou no início da tarde às 15h?
+        `);
+        CONV_STATE.visitProposed = true;
+        return;
+      }
+
+      if (isCuriousJustLooking) {
+        appendAgentMessage(`
+          Perfeito! O melhor momento para mapear o mercado é com serenidade e sem pressão comercial.
+          <br><br>
+          Além do acervo público, temos uma carteira confidencial <em>off-market</em> na Praia da Costa. Se surgir uma oportunidade rara com valor de ocasião, gostaria que eu te avisasse por aqui?
+        `);
+        return;
+      }
+
       if (asksCondoIptu) {
         appendAgentMessage(`
-          Transparência de custos é fundamental na tomada de decisão. Segue o levantamento oficial de taxas das unidades na Praia da Costa:
+          Transparência de custos é fundamental! Segue o resumo das taxas oficiais na Praia da Costa:
           <br><br>
-          🏢 <strong>1. Mansão Frente Mar (400m² - Gil Veloso):</strong><br>
-          • Condomínio: <strong>R$ 2.450 / mês</strong> (inclui portaria 24h blindada, segurança privada, zeladoria, água e lazer resort completo).<br>
-          • IPTU: <strong>R$ 4.200 / ano</strong>.<br><br>
-          🏢 <strong>2. Residência Gourmet (260m² - Champagnat):</strong><br>
-          • Condomínio: <strong>R$ 1.650 / mês</strong>.<br>
-          • IPTU: <strong>R$ 2.800 / ano</strong>.<br><br>
-          🏢 <strong>3. Edifício Atlantis (180m² - Quadra do Mar):</strong><br>
-          • Condomínio: <strong>R$ 1.100 / mês</strong>.<br>
-          • IPTU: <strong>R$ 1.900 / ano</strong>.<br><br>
-          Esses valores de manutenção mensal estão dentro do planejamento financeiro da sua família?
+          • <strong>Mansão Frente Mar:</strong> Cond. R$ 2.450/mês | IPTU R$ 4.200/ano (Lazer resort + portaria 24h)<br>
+          • <strong>Residência Gourmet:</strong> Cond. R$ 1.650/mês | IPTU R$ 2.800/ano<br>
+          • <strong>Edifício Atlantis:</strong> Cond. R$ 1.100/mês | IPTU R$ 1.900/ano
+          <br><br>
+          Esses valores estão dentro do planejamento financeiro da sua família?
         `);
-        addAuditLog('CUSTOS & TAXAS', 'Condomínio e IPTU Informados', 'Detalhamento de taxas e custos fixos enviado ao cliente.');
         return;
       }
 
       if (asksPermuta) {
         CONV_STATE.permutaMentioned = true;
         appendAgentMessage(`
-          Sim! Temos excelente flexibilidade para negociação de permuta:
+          Sim! Na <strong>Mansão Frente Mar (R$ 3.8M)</strong>, o proprietário analisa apartamento menor na Praia da Costa ou Itaparica até R$ 1.200.000 como parte de pagamento.
           <br><br>
-          • Na <strong>Mansão Frente Mar (R$ 3.8M)</strong>, o proprietário é médico cirurgião, está transferindo residência para São Paulo e nos autorizou formalmente a analisar <strong>apartamentos de 2 ou 3 quartos na Praia da Costa ou Itaparica até R$ 1.200.000</strong> como dação em pagamento.<br>
-          • Na <strong>Residência Gourmet (R$ 2.85M)</strong>, o proprietário avalia veículos importados de alta liquidez (Porsche, BMW, Mercedes) ou imóvel menor.<br><br>
-          Para eu checar a viabilidade agora mesmo com a nossa diretoria:
-          <br>
-          • Em qual condomínio ou rua fica o seu imóvel?<br>
-          • Qual a metragem e quantas vagas de garagem ele possui?
+          Qual é o condomínio, metragem e quantas vagas possui o seu imóvel para checarmos a viabilidade?
         `);
-        addAuditLog('PERMUTA IA', 'Qualificação de Imóvel de Entrada', 'Registrada possibilidade de permuta até R$ 1.2M. Ficha enriquecida no CRM.');
         return;
       }
 
       if (asksFinanciamento) {
         appendAgentMessage(`
-          Rodei a simulação oficial na esteira bancária Caixa Econômica Federal (Tabela SAC com amortização decrescente) para a Mansão Frente Mar:
+          Para a Mansão Frente Mar (R$ 3.8M pela Caixa - Tabela SAC):
           <br><br>
-          💰 <strong>Valor do Imóvel:</strong> R$ 3.800.000<br>
-          💵 <strong>Entrada Mínima Sugerida (20%):</strong> R$ 760.000 (podendo abater FGTS ou permuta)<br>
-          🏦 <strong>Saldo Financiado (80%):</strong> R$ 3.040.000 em até 420 meses<br>
-          📉 <strong>1ª Parcela Estimada:</strong> R$ 11.890 / mês (amortização decrescente)<br>
-          📉 <strong>Última Parcela:</strong> R$ 2.450 / mês<br>
-          💼 <strong>Renda Familiar Bruta Recomendada:</strong> aprox. R$ 39.600 (pode compor renda entre cônjuges ou sócios).
+          • <strong>Entrada sugerida (20%):</strong> R$ 760.000 (podendo abater FGTS ou permuta)<br>
+          • <strong>Financiamento (80%):</strong> R$ 3.040.000 em até 420 meses (1ª parcela aprox. R$ 11.890)<br>
+          • <strong>Renda familiar recomendada:</strong> a partir de R$ 39.600
           <br><br>
-          A Velox possui correspondente bancário Caixa próprio dentro da agência e conseguimos aprovar a carta de crédito em menos de 48 horas. Você gostaria de pré-aprovar sem compromisso?
+          Temos correspondente bancário Caixa próprio e aprovamos sua carta em 48h. Deseja uma simulação oficial com seus dados?
         `);
-        addAuditLog('ESTEIRA DE CRÉDITO', 'Simulação Caixa SAC Enviada', 'Cálculo de 1ª parcela R$ 11.890 e renda sugerida R$ 39.600 enviado ao cliente.');
         return;
       }
 
       if (asksPet || asksGaragem) {
         CONV_STATE.petsMentioned = true;
         appendAgentMessage(`
-          Excelente preocupação! Para quem tem família e pets, o conforto diário faz toda a diferença:
+          A Mansão Frente Mar é <strong>100% pet-friendly</strong>, com acesso direto ao calçadão para passeios. Além disso, conta com <strong>4 vagas soltas e cobertas</strong> no subsolo para SUVs grandes, sem manobras de gaveta.
           <br><br>
-          🐾 <strong>Animais de Estimação:</strong> Na <strong>Mansão Frente Mar</strong>, o condomínio é <strong>100% pet-friendly</strong>, conta com área verde privativa e portão de acesso direto ao calçadão para passeio matinal.<br>
-          🚗 <strong>Vagas de Garagem:</strong> O apartamento possui <strong>4 vagas soltas e cobertas</strong> no subsolo. Não há gavetas — você entra e sai com SUVs de grande porte com total liberdade.
-          <br><br>
-          Quantos veículos vocês costumam utilizar no dia a dia?
+          Quantos veículos vocês costumam utilizar na rotina?
         `);
-        addAuditLog('QUALIFICAÇÃO PERFIL', 'Pet-Friendly & 4 Vagas Soltas', 'Confirmado perfil de comprador com animais e veículos de grande porte.');
         return;
       }
 
       if (asksQuartos) {
         appendAgentMessage(`
-          A planta da <strong>Mansão Frente Mar</strong> foi desenhada para privacidade máxima:
+          A <strong>Mansão Frente Mar</strong> possui 400m² privativos com 4 suítes plenas (master com closet walk-in e hidromassagem debruçada no mar), além de living de 120m² e varanda gourmet.
           <br><br>
-          • <strong>4 suítes plenas</strong>, todas com tratamento acústico no contrapiso.<br>
-          • <strong>Suíte Master:</strong> Amplo closet walk-in senhor e senhora, banheiro duplo com cubas esculpidas e banheira de imersão debruçada na vista para o mar.<br>
-          • <strong>Living Social:</strong> 120m² integrados à varanda gourmet com churrasqueira a carvão e cortina de vidro retrátil.<br>
-          • <strong>Área Íntima Independente:</strong> Rouparia privativa e circulação de serviço 100% separada.
-          <br><br>
-          Gostaria que eu te enviasse o PDF da planta humanizada com as medidas exatas de cada cômodo?
+          Gostaria que eu te enviasse o PDF da planta humanizada com as medidas detalhadas?
         `);
         return;
       }
@@ -1441,144 +1495,63 @@
       if (asksFotos) {
         const props = PORTFOLIO_DB['praia-da-costa'];
         appendAgentMessage(`
-          Com certeza! Aqui estão os registros visuais e as fichas das unidades da Praia da Costa:
+          Aqui estão os registros visuais das unidades na Praia da Costa:
           ${renderPropertyMiniCard(props[0])}
-          ${renderPropertyMiniCard(props[1])}
-          Temos também um <strong>vídeo tour gravado em 4K</strong> com drone mostrando a vista panorâmica da orla e o interior decorado. 
-          <br><br>
-          Prefere receber o link do vídeo em alta resolução ou já agendar um horário para ver a vista ao vivo da varanda?
+          Temos também um <strong>vídeo tour gravado em 4K</strong> com drone mostrando a orla e o interior decorado. Prefere receber o link do vídeo ou agendar um horário para ver a vista ao vivo?
         `);
         return;
       }
 
-      // 7. EXPLORATION / DISCOVERY: PRAIA DA COSTA
-      if (mentionsPraiaDaCosta && !asksDisponiveis) {
-        CONV_STATE.activeBairro = 'praia-da-costa';
-        const greetingPrefix = asksCumprimento 
-          ? `Boa tarde! Seja muito bem-vindo à <strong>Velox Imóveis</strong>.<br><br>`
-          : `Excelente escolha! `;
-
+      // 14. CATALOG / AVAILABLE LISTING
+      if (isConhecerOpcoes) {
+        const b = CONV_STATE.activeBairro || 'praia-da-costa';
+        const props = PORTFOLIO_DB[b] || PORTFOLIO_DB['praia-da-costa'];
         appendAgentMessage(`
-          ${greetingPrefix}A <strong>Praia da Costa</strong> é, sem dúvida, a região mais nobre, valorizada e desejada de Vila Velha.
+          Com certeza! Estas são as nossas principais unidades com disponibilidade imediata:
           <br><br>
-          Temos opções exclusivas selecionadas aqui no bairro. Para eu te direcionar exatamente o que faz sentido:
-          <br><br>
-          Você busca um imóvel para <strong>moradia da sua família</strong> ou com foco em <strong>investimento</strong>?
-          E no momento, você prioriza <strong>frente mar definitiva</strong> (pé na areia na Gil Veloso) ou uma <strong>2ª quadra mais reservada</strong> (como na região nobre da Champagnat)?
+          • <strong>${props[0].title}:</strong> ${props[0].area}, ${props[0].suites} — <strong>${props[0].price}</strong><br>
+          ${props[1] ? `• <strong>${props[1].title}:</strong> ${props[1].area}, ${props[1].suites} — <strong>${props[1].price}</strong>` : ''}
+          ${renderPropertyMiniCard(props[0])}
+          Qual faixa de valor ou perfil se encaixa melhor no seu planejamento?
         `);
-        addAuditLog('ACOLHIMENTO INICIAL', 'Praia da Costa Selecionada', 'ImobIA acolheu o lead com elegância e abriu qualificação consultiva (moradia vs investimento | frente mar vs 2ª quadra).');
         return;
       }
 
-      // 8. EXPLORATION / DISCOVERY: ITAPARICA
-      if (mentionsItaparica && !asksDisponiveis) {
-        CONV_STATE.activeBairro = 'itaparica';
-        appendAgentMessage(`
-          Excelente escolha! A <strong>Praia de Itaparica</strong> é a orla que mais valoriza em Vila Velha (+14% a.a.), com polo gastronômico e novos empreendimentos modernos.
-          <br><br>
-          Temos opções exclusivas frente mar aqui no bairro. Para eu te direcionar:
-          <br><br>
-          Você busca para <strong>moradia da sua família</strong> ou <strong>investimento</strong>?
-          E vocês preferem a exclusividade de uma <strong>cobertura com piscina privativa</strong> ou a praticidade de um <strong>apartamento tipo frente mar</strong>?
-        `);
-        addAuditLog('ACOLHIMENTO INICIAL', 'Itaparica Selecionada', 'ImobIA acolheu o lead e abriu qualificação consultiva para Itaparica.');
-        return;
-      }
-
-      // 9. EXPLORATION / DISCOVERY: ITAPUÃ
-      if (mentionsItapua && !asksDisponiveis) {
-        CONV_STATE.activeBairro = 'itapua';
-        appendAgentMessage(`
-          A <strong>Praia de Itapuã</strong> é perfeita para quem busca a comodidade de fazer tudo a pé, próxima aos melhores restaurantes e ao polo comercial da Hugo Musso.
-          <br><br>
-          Temos uma unidade de design contemporâneo impecável no bairro (210m², 3 suítes, marcenaria pronta).
-          <br><br>
-          Você procura um imóvel pronto para morar de imediato ou estuda opções para personalizar?
-        `);
-        addAuditLog('ACOLHIMENTO INICIAL', 'Itapuã Selecionada', 'ImobIA acolheu o lead e abriu qualificação consultiva para Itapuã.');
-        return;
-      }
-
-      // 10. CATALOG / AVAILABLE LISTING
-      if (asksDisponiveis) {
-        if (CONV_STATE.activeBairro === 'praia-da-costa') {
-          const props = PORTFOLIO_DB['praia-da-costa'];
-          appendAgentMessage(`
-            Com certeza! Na <strong>Praia da Costa</strong>, estas são as nossas 3 unidades ativas com disponibilidade imediata para visitação:
-            <br><br>
-            • <strong>Mansão Frente Mar (Gil Veloso):</strong> 400m², 4 suítes, 4 vagas livres, vista cinematográfica — <strong>R$ 3.800.000</strong>.<br>
-            • <strong>Residência Gourmet (Champagnat):</strong> 260m², 4 suítes, 3 vagas, espaço gourmet privativo — <strong>R$ 2.850.000</strong>.<br>
-            • <strong>Edifício Atlantis (2ª Quadra):</strong> 180m², 3 suítes, lazer clube completo — <strong>R$ 1.950.000</strong>.
-            ${renderPropertyMiniCard(props[0])}
-            ${renderPropertyMiniCard(props[1])}
-            ${renderPropertyMiniCard(props[2])}
-            Você pode clicar em <strong>Ver Detalhes & Custos</strong> em qualquer um deles para conferir condomínio e IPTU, ou me avisar qual faixa de valor se encaixa melhor no seu planejamento!
-          `);
-          addAuditLog('CATÁLOGO DISPONÍVEL', 'Imóveis Praia da Costa Listados', 'Exibidas as 3 opções da Praia da Costa com cartões interativos.');
-          return;
-        } else if (CONV_STATE.activeBairro === 'itaparica') {
-          const props = PORTFOLIO_DB['itaparica'];
-          appendAgentMessage(`
-            Em <strong>Itaparica</strong>, as nossas unidades ativas na orla são:
-            <br><br>
-            • <strong>Cobertura Duplex:</strong> 320m², 3 suítes, piscina privativa no terraço — <strong>R$ 3.200.000</strong>.<br>
-            • <strong>Edifício Sunset:</strong> 190m², 3 suítes, varanda gourmet integrada — <strong>R$ 2.000.000</strong>.
-            ${renderPropertyMiniCard(props[0])}
-            ${renderPropertyMiniCard(props[1])}
-            Você prefere a privacidade de uma cobertura com piscina exclusiva ou a praticidade de um apartamento tipo?
-          `);
-          return;
-        } else {
-          // General overview across all regions
-          appendAgentMessage(`
-            Trabalhamos com curadoria rigorosa de alto padrão nas melhores praias de Vila Velha:
-            <br><br>
-            📍 <strong>Praia da Costa:</strong> Mansão Frente Mar (400m², 4 suítes) • <em>R$ 3.8M</em> e Residência Gourmet (260m²) • <em>R$ 2.85M</em>.<br>
-            📍 <strong>Praia de Itaparica:</strong> Cobertura Duplex com piscina privativa (320m²) • <em>R$ 3.2M</em>.<br>
-            📍 <strong>Praia de Itapuã:</strong> Apartamento Design (210m², 3 suítes) • <em>R$ 2.4M</em>.
-            <br><br>
-            Em qual desses bairros você e sua família gostariam mais de morar?
-          `);
-          addAuditLog('CATÁLOGO GERAL', 'Apresentação Panorâmica', 'Apresentadas as opções de topo na Praia da Costa, Itaparica e Itapuã.');
-          return;
-        }
-      }
-
-      // 11. GREETING ONLY
       if (asksCumprimento) {
         appendAgentMessage(`
-          Olá! Tudo ótimo por aqui, e com você? Seja muito bem-vindo à <strong>Velox Imóveis</strong>!
+          Olá! Seja muito bem-vindo à <strong>Velox Imóveis</strong>.
           <br><br>
-          Sou o <strong>ImobIA</strong>, consultor digital de alta renda da imobiliária. Estou à sua inteira disposição para apresentar as melhores oportunidades de alto padrão na orla de Vila Velha.
-          <br><br>
-          Hoje temos unidades selecionadas na <strong>Praia da Costa, Itaparica e Itapuã</strong>. Qual dessas regiões ou perfil de imóvel você gostaria de priorizar?
+          Sou o <strong>ImobIA</strong>, consultor digital de alta renda. Temos unidades selecionadas na Praia da Costa, Itaparica e Itapuã. Qual região ou perfil de imóvel você gostaria de priorizar?
         `);
         return;
       }
 
-      // 12. GRATITUDE / FAREWELL
       if (asksAgradecimento) {
         appendAgentMessage(`
-          Eu que agradeço a confiança! Nosso compromisso na Velox é proporcionar uma experiência de compra ágil, segura e altamente personalizada.
-          <br><br>
-          Fico 100% à sua disposição por aqui. Se lembrar de mais alguma pergunta sobre documentação, custos ou visitas, é só me mandar uma mensagem a qualquer hora!
+          Eu que agradeço a confiança! Fico 100% à sua disposição. Se surgir qualquer dúvida sobre documentação, valores ou visitas, é só me chamar a qualquer momento.
         `);
         return;
       }
 
-      // 13. CONTEXT-AWARE INTELLIGENT FALLBACK
-      const currentBairroText = CONV_STATE.activeBairro === 'praia-da-costa' ? 'na Praia da Costa' :
-                                CONV_STATE.activeBairro === 'itaparica' ? 'em Itaparica' :
-                                CONV_STATE.activeBairro === 'itapua' ? 'em Itapuã' : 'na orla';
+      // 15. PROGRESSIVE INTELLIGENT FALLBACK (NEVER REPEATS TEXT)
+      CONV_STATE.fallbackStep = (CONV_STATE.fallbackStep || 0) + 1;
 
-      appendAgentMessage(`
-        Compreendi o seu ponto sobre a sua busca ${currentBairroText}!
-        <br><br>
-        Além dos imóveis do acervo público, a Velox opera com uma carteira confidencial <em>off-market</em> para clientes seletos.
-        <br><br>
-        Para eu refinar exatamente o que faz sentido para você: você prioriza um apartamento <strong>com 4 suítes e varanda gourmet ampla</strong> de frente para o mar, ou gostaria de avaliar opções com <strong>condição de permuta</strong>?
-      `);
-      addAuditLog('QUALIFICAÇÃO CONTÍNUA', 'Diálogo Contextual Imobiliário', `ImobIA aprofundou a qualificação de perfil (${rawText.substring(0, 40)}...).`);
+      if (CONV_STATE.fallbackStep === 1) {
+        appendAgentMessage(`
+          Entendido! Para eu te atender com agilidade e precisão: você gostaria de receber nosso <strong>Dossiê Digital em PDF</strong> com as melhores opções da orla ou prefere agendar uma visita com o nosso consultor sênior <strong>Roberto Mantovani</strong>?
+        `);
+        addAuditLog('QUALIFICAÇÃO CONTÍNUA', 'Direcionamento SDR (Dossiê vs Visita)', 'Lead direcionado para escolha de próximo passo.');
+      } else if (CONV_STATE.fallbackStep === 2) {
+        appendAgentMessage(`
+          Para sermos bem assertivos e não tomar seu tempo: posso pedir para o nosso corretor sênior <strong>Roberto Mantovani</strong> entrar em contato direto com você para esclarecer esse ponto. Qual o seu nome e melhor WhatsApp?
+        `);
+        addAuditLog('TRANSBORDAMENTO SDR', 'Solicitação de Contato para Corretor', 'Lead direcionado para atendimento humano direto.');
+      } else {
+        appendAgentMessage(`
+          Perfeito! Solicitação registrada. O corretor <strong>Roberto Mantovani</strong> já foi acionado com seu histórico de conversa e entrará em contato em breve. Fico à inteira disposição!
+        `);
+        addAuditLog('LEAD ENCAMINHADO', 'Transferência para Roberto Mantovani', 'Transbordo para corretor sênior concluído.');
+      }
     }
 
     // ==========================================================================
