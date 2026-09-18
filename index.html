@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VELOX CRM | Inteligência Imobiliária & IA Conversacional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark-theme">
+  <!-- Speed to Lead SLA Floating Banner -->
+  <header class="sla-ticker-banner" id="slaBanner">
+    <div class="sla-container">
+      <div class="sla-status-badge pulse-fast">
+        <i class="fa-solid fa-bolt"></i> <span>SPEED TO LEAD ATIVO</span>
+      </div>
+      <div class="sla-info">
+        <span class="sla-source"><i class="fa-solid fa-fire"></i> Novo Lead ZAP Imóveis:</span>
+        <strong id="slaLeadName">Dr. Eduardo Albuquerque</strong>
+        <span class="sla-property">procurando: <em>Cobertura Duplex Praia da Costa</em></span>
+      </div>
+      <div class="sla-countdown-box">
+        <span class="sla-label">Tempo para redistribuir:</span>
+        <div class="sla-timer" id="slaTimer">04:18</div>
+      </div>
+      <div class="sla-actions">
+        <button class="btn-sla-quick" onclick="openWhatsAppModal('lead-1')">
+          <i class="fa-brands fa-whatsapp"></i> Iniciar Atendimento
+        </button>
+        <button class="btn-sla-dismiss" title="Fechar barra" onclick="dismissSlaBanner()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-building-shield"></i>
+        </div>
+        <div class="brand-text">
+          <h1>VELOX<span>CRM</span></h1>
+          <p>Real Estate AI Platform</p>
+        </div>
+      </div>
+
+      <div class="broker-mini-profile">
+        <div class="avatar-ring online">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&auto=format&fit=crop&q=80" alt="Roberto Mantovani" />
+        </div>
+        <div class="broker-info">
+          <span class="broker-name">Roberto Mantovani</span>
+          <span class="broker-role"><i class="fa-solid fa-crown text-gold"></i> Top Producer</span>
+        </div>
+        <div class="broker-status-dot" title="Online no WhatsApp"></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">PRINCIPAL</div>
+        <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Dashboard & KPIs</span>
+        </a>
+        <a href="#kanban" class="nav-item" data-tab="kanban">
+          <i class="fa-solid fa-table-columns"></i>
+          <span>Pipeline de Vendas</span>
+          <span class="badge badge-emerald">6 Ativos</span>
+        </a>
+        <a href="#whatsapp" class="nav-item" data-tab="whatsapp">
+          <i class="fa-brands fa-whatsapp"></i>
+          <span>Central WhatsApp IA</span>
+          <span class="badge badge-red pulse">24/7</span>
+        </a>
+        <a href="#matchmaker" class="nav-item" data-tab="matchmaker">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Matchmaker Inteligente</span>
+          <span class="badge badge-gold">Reverso</span>
+        </a>
+
+        <div class="nav-section-label">OPERAÇÃO IMOBILIÁRIA</div>
+        <a href="#imoveis" class="nav-item" data-tab="imoveis">
+          <i class="fa-solid fa-house-chimney"></i>
+          <span>Estoque & Portais XML</span>
+        </a>
+        <a href="#modo-visita" class="nav-item" data-tab="modo-visita">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          <span>Modo Visita (Campo)</span>
+          <span class="badge badge-amber">Sigiloso</span>
+        </a>
+        <a href="#credito" class="nav-item" data-tab="credito">
+          <i class="fa-solid fa-calculator"></i>
+          <span>Esteira de Crédito</span>
+        </a>
+        <a href="#documentos" class="nav-item" data-tab="documentos">
+          <i class="fa-solid fa-file-signature"></i>
+          <span>Documentos & ZapSign</span>
+        </a>
+        <a href="#bi-avm" class="nav-item" data-tab="bi-avm">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>BI, ROI & AVM m²</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="portal-sync-status">
+          <div class="sync-row">
+            <span class="sync-dot active"></span>
+            <span>Feed ZAP / VivaReal</span>
+            <strong>OK (18 min)</strong>
+          </div>
+          <div class="sync-row">
+            <span class="sync-dot active"></span>
+            <span>Meta Ads Webhook</span>
+            <strong>Instantâneo</strong>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button class="btn-icon mobile-menu-toggle" id="menuToggle" aria-label="Abrir menu" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-box">
+            <h2 id="currentTabTitle">Dashboard Executivo</h2>
+            <p id="currentTabSubtitle">Visão geral do pipeline de vendas, SLA de atendimento e velocidade de conversão</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Quick Lead Dispatcher Status -->
+          <div class="round-robin-pill" title="Rodízio automático de corretores ativado">
+            <i class="fa-solid fa-arrows-rotate fa-spin-pulse"></i>
+            <span>Rodízio: <strong>Fila Alto Padrão (3 online)</strong></span>
+          </div>
+
+          <!-- Quick Action: Novo Lead / Simular Portais -->
+          <button class="btn-secondary" onclick="simulateNewLeadArrival()">
+            <i class="fa-solid fa-bolt-lightning text-gold"></i> Simular Lead Portal
+          </button>
+
+          <!-- Quick Launch Modo Visita -->
+          <button class="btn-gold" onclick="switchTab('modo-visita')">
+            <i class="fa-solid fa-key"></i> Modo Visita
+          </button>
+
+          <!-- Notifications -->
+          <div class="notifications-bell" id="bellIcon" onclick="toggleNotifications()">
+            <i class="fa-regular fa-bell"></i>
+            <span class="unread-dot"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD & SPEED TO LEAD -->
+      <section id="view-dashboard" class="view-panel active">
+        <!-- Top Metrics Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card gold-border">
+            <div class="metric-header">
+              <span class="metric-title">Speed to Lead Médio</span>
+              <div class="metric-icon-box bg-gold-soft">
+                <i class="fa-solid fa-stopwatch text-gold"></i>
+              </div>
+            </div>
+            <div class="metric-value">42s</div>
+            <div class="metric-trend positive">
+              <i class="fa-solid fa-arrow-trend-down"></i> <strong>-84%</strong> vs média do mercado (32min)
+            </div>
+            <div class="metric-subtext">IA responde em 10 segundos no WhatsApp</div>
+          </div>
+
+          <div class="metric-card emerald-border">
+            <div class="metric-header">
+              <span class="metric-title">Leads Qualificados (Mês)</span>
+              <div class="metric-icon-box bg-emerald-soft">
+                <i class="fa-solid fa-filter-circle-dollar text-emerald"></i>
+              </div>
+            </div>
+            <div class="metric-value">128</div>
+            <div class="metric-trend positive">
+              <i class="fa-solid fa-arrow-trend-up"></i> <strong>+31%</strong> vs mês anterior
+            </div>
+            <div class="metric-subtext">Taxa de qualificação autônoma: <strong>68.4%</strong></div>
+          </div>
+
+          <div class="metric-card blue-border">
+            <div class="metric-header">
+              <span class="metric-title">Visitas Agendadas por IA</span>
+              <div class="metric-icon-box bg-blue-soft">
+                <i class="fa-solid fa-calendar-check text-blue"></i>
+              </div>
+            </div>
+            <div class="metric-value">46</div>
+            <div class="metric-trend positive">
+              <i class="fa-solid fa-robot"></i> <strong>38 diretas pela IA</strong> sem atrito humano
+            </div>
+            <div class="metric-subtext">Taxa de comparecimento: <strong>89%</strong></div>
+          </div>
+
+          <div class="metric-card purple-border">
+            <div class="metric-header">
+              <span class="metric-title">VGV em Negociação Ativa</span>
+              <div class="metric-icon-box bg-purple-soft">
+                <i class="fa-solid fa-gem text-purple"></i>
+              </div>
+            </div>
+            <div class="metric-value">R$ 38.4M</div>
+            <div class="metric-trend positive">
+              <i class="fa-solid fa-handshake"></i> <strong>11 propostas</strong> em formalização
+            </div>
+            <div class="metric-subtext">Ticket médio: <strong>R$ 3.490.000</strong></div>
+          </div>
+        </div>
+
+        <!-- Speed to Lead Active Monitor + Channel ROI -->
+        <div class="dashboard-split-grid">
+          <!-- Speed to Lead Live Queue -->
+          <div class="dashboard-card">
+            <div class="card-title-row">
+              <div>
+                <h3><i class="fa-solid fa-bolt text-gold"></i> Fila Ativa de Speed to Lead (SLA 5 Minutos)</h3>
+                <p>Leads recebidos dos portais aguardando primeiro contato do corretor</p>
+              </div>
+              <span class="badge badge-red">Redistribuição Automática</span>
+            </div>
+
+            <div class="sla-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Lead</th>
+                    <th>Origem</th>
+                    <th>Imóvel de Interesse</th>
+                    <th>Corretor Atual</th>
+                    <th>Tempo Restante</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="slaTableBody">
+                  <!-- Dynamically injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Multichannel Ingestion Performance -->
+          <div class="dashboard-card">
+            <div class="card-title-row">
+              <div>
+                <h3><i class="fa-solid fa-network-wired text-emerald"></i> Ingestão Multicanal em Tempo Real</h3>
+                <p>Distribuição de leads por canal nas últimas 24 horas</p>
+              </div>
+              <span class="badge badge-emerald">Webhooks Ativos</span>
+            </div>
+
+            <div class="channel-bars-list">
+              <div class="channel-bar-item">
+                <div class="channel-meta">
+                  <span><i class="fa-solid fa-building text-blue"></i> ZAP Imóveis (Feed XML)</span>
+                  <strong>48 leads (37%)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width: 37%; background: #3b82f6;"></div></div>
+              </div>
+
+              <div class="channel-bar-item">
+                <div class="channel-meta">
+                  <span><i class="fa-solid fa-house-signal text-orange"></i> VivaReal</span>
+                  <strong>36 leads (28%)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width: 28%; background: #f97316;"></div></div>
+              </div>
+
+              <div class="channel-bar-item">
+                <div class="channel-meta">
+                  <span><i class="fa-brands fa-meta text-cyan"></i> Meta Ads (Instagram/Facebook)</span>
+                  <strong>26 leads (20%)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width: 20%; background: #06b6d4;"></div></div>
+              </div>
+
+              <div class="channel-bar-item">
+                <div class="channel-meta">
+                  <span><i class="fa-solid fa-globe text-emerald"></i> Landing Page Scrollytelling</span>
+                  <strong>19 leads (15%)</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width: 15%; background: #10b981;"></div></div>
+              </div>
+            </div>
+
+            <div class="governance-alert-box">
+              <i class="fa-solid fa-shield-halved text-emerald"></i>
+              <div>
+                <strong>Governança de Dados Garantida:</strong>
+                <span>Todos os 129 leads e histórico de conversas estão armazenados na conta matriz da imobiliária. Nenhum dado fica restrito ao celular pessoal do corretor.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: KANBAN PIPELINE -->
+      <section id="view-kanban" class="view-panel">
+        <div class="kanban-toolbar">
+          <div class="kanban-filters">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="kanbanSearch" placeholder="Buscar por cliente, imóvel, bairro..." oninput="filterKanban()" />
+            </div>
+            <select id="filterCorretor" onchange="filterKanban()">
+              <option value="todos">Todos os Corretores</option>
+              <option value="Roberto Mantovani">Roberto Mantovani</option>
+              <option value="Camila Siqueira">Camila Siqueira</option>
+              <option value="Rodrigo Castro">Rodrigo Castro</option>
+            </select>
+            <select id="filterOrigem" onchange="filterKanban()">
+              <option value="todos">Todos os Portais</option>
+              <option value="ZAP Imóveis">ZAP Imóveis</option>
+              <option value="VivaReal">VivaReal</option>
+              <option value="Meta Ads">Meta Ads</option>
+              <option value="Site Scrollytelling">Site Direto</option>
+            </select>
+          </div>
+
+          <div class="kanban-actions">
+            <button class="btn-primary" onclick="openNewLeadModal()">
+              <i class="fa-solid fa-plus"></i> Novo Lead Manual
+            </button>
+          </div>
+        </div>
+
+        <!-- Kanban Board Columns -->
+        <div class="kanban-board" id="kanbanBoard">
+          <!-- Coluna 1: Novo Lead -->
+          <div class="kanban-column" data-stage="novo">
+            <div class="column-header">
+              <div class="col-title">
+                <span class="status-indicator bg-blue"></span>
+                <h3>Novo Lead</h3>
+              </div>
+              <span class="col-counter" id="count-novo">0</span>
+            </div>
+            <div class="kanban-cards-area" id="cards-novo" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'novo')"></div>
+          </div>
+
+          <!-- Coluna 2: Contato Realizado -->
+          <div class="kanban-column" data-stage="contato">
+            <div class="column-header">
+              <div class="col-title">
+                <span class="status-indicator bg-cyan"></span>
+                <h3>Qualificado / IA</h3>
+              </div>
+              <span class="col-counter" id="count-contato">0</span>
+            </div>
+            <div class="kanban-cards-area" id="cards-contato" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'contato')"></div>
+          </div>
+
+          <!-- Coluna 3: Visita Agendada -->
+          <div class="kanban-column" data-stage="visita-agendada">
+            <div class="column-header">
+              <div class="col-title">
+                <span class="status-indicator bg-amber"></span>
+                <h3>Visita Agendada</h3>
+              </div>
+              <span class="col-counter" id="count-visita-agendada">0</span>
+            </div>
+            <div class="kanban-cards-area" id="cards-visita-agendada" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'visita-agendada')"></div>
+          </div>
+
+          <!-- Coluna 4: Visita Realizada -->
+          <div class="kanban-column" data-stage="visita-feita">
+            <div class="column-header">
+              <div class="col-title">
+                <span class="status-indicator bg-purple"></span>
+                <h3>Visita Realizada</h3>
+              </div>
+              <span class="col-counter" id="count-visita-feita">0</span>
+            </div>
+            <div class="kanban-cards-area" id="cards-visita-feita" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'visita-feita')"></div>
+          </div>
+
+          <!-- Coluna 5: Proposta Comercial -->
+          <div class="kanban-column" data-stage="proposta">
+            <div class="column-header">
+              <div class="col-title">
+                <span class="status-indicator bg-gold"></span>
+                <h3>Proposta Comercial</h3>
+              </div>
+              <span class="col-counter" id="count-proposta">0</span>
+            </div>
+            <div class="kanban-cards-area" id="cards-proposta" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'proposta')"></div>
+          </div>
+
+          <!-- Coluna 6: Fechamento / Contrato -->
+          <div class="kanban-column" data-stage="fechamento">
+            <div class="column-header">
+              <div class="col-title">
+                <span class="status-indicator bg-emerald"></span>
+                <h3>Contrato / Assinatura</h3>
+              </div>
+              <span class="col-counter" id="count-fechamento">0</span>
+            </div>
+            <div class="kanban-cards-area" id="cards-fechamento" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'fechamento')"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: CENTRAL WHATSAPP IA (24/7) -->
+      <section id="view-whatsapp" class="view-panel">
+        <div class="whatsapp-layout">
+          <!-- WhatsApp Chat List Sidebar -->
+          <div class="whatsapp-contacts-sidebar">
+            <div class="wa-search-bar">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" placeholder="Pesquisar conversa ou número..." id="waSearchInput" oninput="filterWhatsAppContacts()" />
+            </div>
+
+            <div class="wa-ai-toggle-pill">
+              <div class="ai-status">
+                <span class="pulse-dot"></span>
+                <span>Agente IA 24/7 Ativo</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="aiAutoPilotCheckbox" checked onchange="toggleAiAutoPilot(this)" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="wa-contacts-list" id="waContactsList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- WhatsApp Chat Window -->
+          <div class="whatsapp-conversation-pane" id="waChatPane">
+            <!-- Chat Header -->
+            <div class="wa-chat-header">
+              <div class="wa-active-user">
+                <div class="avatar-ring online">
+                  <img id="waChatAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
+                </div>
+                <div class="wa-header-info">
+                  <h4 id="waChatName">Dr. Eduardo Albuquerque</h4>
+                  <div class="wa-header-tags">
+                    <span class="badge badge-emerald" id="waChatBadge">Cobertura Duplex</span>
+                    <span class="text-muted" id="waChatPhone">+55 (27) 99812-4400</span>
+                    <span class="text-gold" id="waChatStage"><i class="fa-solid fa-flag"></i> Visita Agendada</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="wa-header-actions">
+                <!-- Button: IA Summary -->
+                <button class="btn-ai-summary" onclick="generateExecutiveSummary()" title="Gerar resumo executivo da conversa com IA">
+                  <i class="fa-solid fa-wand-magic-sparkles text-gold"></i> Resumo IA
+                </button>
+                <!-- Button: Modo Visita Shortcut -->
+                <button class="btn-icon" onclick="openModoVisitaForActiveChat()" title="Abrir Ficha Modo Visita">
+                  <i class="fa-solid fa-key text-gold"></i>
+                </button>
+                <!-- Button: Agendar Visita -->
+                <button class="btn-icon" onclick="openScheduleVisitModal()" title="Agendar Visita no Google Agenda">
+                  <i class="fa-regular fa-calendar-plus text-blue"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Chat Messages Flow -->
+            <div class="wa-messages-body" id="waMessagesBody">
+              <!-- Messages injected dynamically -->
+            </div>
+
+            <!-- AI Quick Suggestion Chips -->
+            <div class="wa-ai-chips-bar" id="waAiChipsBar">
+              <span class="chips-label"><i class="fa-solid fa-sparkles text-gold"></i> Sugestões da IA:</span>
+              <button class="chip-btn" onclick="sendAiSuggestedReply(1)">Confirmar visita amanhã às 10h</button>
+              <button class="chip-btn" onclick="sendAiSuggestedReply(2)">Enviar simulação Caixa SAC</button>
+              <button class="chip-btn" onclick="sendAiSuggestedReply(3)">Compartilhar vídeo do living</button>
+            </div>
+
+            <!-- Chat Footer Input -->
+            <div class="wa-chat-input-row">
+              <button class="btn-icon" title="Anexar Proposta / Imagem">
+                <i class="fa-solid fa-paperclip"></i>
+              </button>
+              <input type="text" id="waMessageInput" placeholder="Digite uma mensagem ou deixe a IA responder automaticamente..." onkeypress="handleWaEnter(event)" />
+              <button class="btn-icon btn-mic" id="btnSimulateAudio" title="Simular Áudio do Cliente com Transcrição IA" onclick="simulateIncomingAudio()">
+                <i class="fa-solid fa-microphone"></i>
+              </button>
+              <button class="btn-send-wa" onclick="sendWaMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- WhatsApp Right Panel: AI Insights & Client Dossier -->
+          <div class="whatsapp-dossier-sidebar">
+            <div class="dossier-header">
+              <h3><i class="fa-solid fa-brain text-gold"></i> Diagnóstico da IA (24/7)</h3>
+            </div>
+
+            <div class="dossier-content">
+              <!-- Live Qualification Box -->
+              <div class="dossier-box">
+                <span class="dossier-label">INTENÇÃO & PERFIL MAPEADO</span>
+                <div class="qualification-tags">
+                  <div class="q-tag"><i class="fa-solid fa-wallet"></i> <strong>Orçamento:</strong> R$ 3.0M a R$ 3.8M</div>
+                  <div class="q-tag"><i class="fa-solid fa-credit-card"></i> <strong>Pagamento:</strong> 60% Entrada + Financiamento</div>
+                  <div class="q-tag"><i class="fa-solid fa-arrows-split-up-and-left"></i> <strong>Permuta:</strong> Avalia apto menor Praia da Costa</div>
+                  <div class="q-tag"><i class="fa-solid fa-fire text-red"></i> <strong>Urgência:</strong> Alta (Mudança em 45 dias)</div>
+                  <div class="q-tag"><i class="fa-solid fa-paw"></i> <strong>Requisitos:</strong> 4 quartos, 3 vagas, aceita pet</div>
+                </div>
+              </div>
+
+              <!-- Executive AI Summary Box -->
+              <div class="dossier-box highlight-gold" id="aiSummaryBox">
+                <div class="box-title-row">
+                  <span class="dossier-label"><i class="fa-solid fa-file-lines text-gold"></i> RESUMO EXECUTIVO (GEMINI)</span>
+                  <span class="badge badge-gold" id="summaryUpdatedTag">Atualizado há pouco</span>
+                </div>
+                <div class="ai-summary-text" id="aiSummaryContent">
+                  • <strong>Decisor:</strong> Médico cirurgião, busca privacidade e vista para o Convento da Penha.<br/>
+                  • <strong>Status:</strong> Já visitou fotos e vídeo; aguarda confirmação de visita presencial para sábado às 10h.<br/>
+                  • <strong>Atenção:</strong> Precisa de vaga ampla para SUV grande (Hilux).
+                </div>
+              </div>
+
+              <!-- Matched Properties for this Chat -->
+              <div class="dossier-box">
+                <span class="dossier-label">MATCHES RECOMENDADOS (3)</span>
+                <div class="matched-mini-list" id="matchedMiniList">
+                  <!-- Dynamically inserted -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: MATCHMAKER INTELIGENTE -->
+      <section id="view-matchmaker" class="view-panel">
+        <div class="matchmaker-tabs">
+          <button class="tab-btn active" id="tabMatchDirect" onclick="switchMatchmakerMode('direct')">
+            <i class="fa-solid fa-user-check"></i> Lead &rarr; Busca Imóvel
+          </button>
+          <button class="tab-btn" id="tabMatchReverse" onclick="switchMatchmakerMode('reverse')">
+            <i class="fa-solid fa-arrows-spin text-gold"></i> Matchmaker Reverso (Estoque &rarr; Leads Antigos)
+          </button>
+        </div>
+
+        <!-- MODE 1: LEAD -> IMOVEL -->
+        <div class="matchmaker-body" id="matchDirectContainer">
+          <div class="matchmaker-control-bar">
+            <div class="select-lead-group">
+              <label for="matchLeadSelect">Selecione o Comprador:</label>
+              <select id="matchLeadSelect" onchange="runDirectMatchmaking()">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="lead-active-prefs" id="leadActivePrefs">
+              <!-- Injected -->
+            </div>
+          </div>
+
+          <div class="match-results-header">
+            <h3><i class="fa-solid fa-sparkles text-emerald"></i> Imóveis com Maior Índice de Match Semântico</h3>
+            <span class="text-muted">Cruzamento por metragem, suítes, faixa de preço, sol da manhã e histórico</span>
+          </div>
+
+          <div class="match-cards-grid" id="matchDirectResultsGrid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- MODE 2: REVERSE MATCHMAKER (NOVA CAPTAÇÃO -> BASE DE LEADS) -->
+        <div class="matchmaker-body hidden" id="matchReverseContainer">
+          <div class="reverse-matchmaker-hero">
+            <div class="hero-text">
+              <h2><i class="fa-solid fa-arrows-spin text-gold"></i> Matchmaker Reverso: Reative sua Base Parada</h2>
+              <p>Ao captar um novo imóvel, o algoritmo varre centenas de leads que não compraram nos últimos 12 meses e encontra os compradores ideais com mensagem personalizada de reaquecimento pronta.</p>
+            </div>
+          </div>
+
+          <div class="reverse-control-box">
+            <label for="reversePropertySelect"><strong>Selecione o Imóvel Recém-Captado:</strong></label>
+            <div class="reverse-select-row">
+              <select id="reversePropertySelect" onchange="runReverseMatchmaking()">
+                <!-- Populated dynamically -->
+              </select>
+              <button class="btn-primary" onclick="runReverseMatchmaking()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Varrer Base de Leads
+              </button>
+            </div>
+          </div>
+
+          <div class="reverse-results-layout">
+            <div class="reverse-leads-col">
+              <div class="col-title-badge">
+                <h4><i class="fa-solid fa-users text-blue"></i> Leads Dormentes com Alto Fit (<span id="reverseCount">0</span> encontrados)</h4>
+              </div>
+              <div class="reverse-leads-list" id="reverseLeadsList">
+                <!-- Populated -->
+              </div>
+            </div>
+
+            <!-- Ready-to-Send Pitch Box -->
+            <div class="reverse-pitch-col">
+              <div class="pitch-card">
+                <div class="pitch-header">
+                  <div>
+                    <h4><i class="fa-solid fa-comment-sms text-emerald"></i> Pitch de Reaquecimento Pré-Redigido por IA</h4>
+                    <p class="text-muted">Personalizado com o nome do cliente, imóvel e gatilho de exclusividade</p>
+                  </div>
+                  <span class="badge badge-emerald">Pronto para Enviar</span>
+                </div>
+
+                <div class="pitch-text-box" id="reversePitchText">
+                  Selecione um lead da lista ao lado para carregar a mensagem sob medida gerada pela IA.
+                </div>
+
+                <div class="pitch-actions">
+                  <button class="btn-secondary" onclick="copyPitchText()">
+                    <i class="fa-regular fa-copy"></i> Copiar Mensagem
+                  </button>
+                  <button class="btn-emerald" onclick="openWhatsAppWithPitch()">
+                    <i class="fa-brands fa-whatsapp"></i> Disparar no WhatsApp do Lead
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: IMÓVEIS & SINDICADOR DE PORTAIS -->
+      <section id="view-imoveis" class="view-panel">
+        <div class="imoveis-topbar">
+          <div class="imoveis-title">
+            <h3>Catálogo de Imóveis & Gerador de Feeds XML</h3>
+            <p>Cadastro único sincronizado com ZAP Imóveis, VivaReal, Imovelweb e redes sociais</p>
+          </div>
+          <div class="imoveis-actions">
+            <button class="btn-secondary" onclick="openXmlModal()">
+              <i class="fa-solid fa-code text-blue"></i> Visualizar XML Portais
+            </button>
+            <button class="btn-primary" onclick="openNewPropertyModal()">
+              <i class="fa-solid fa-plus"></i> Novo Imóvel
+            </button>
+          </div>
+        </div>
+
+        <div class="imoveis-grid" id="propertiesCatalogGrid">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- AI Copywriter Section -->
+        <div class="ai-copywriter-card">
+          <div class="copywriter-header">
+            <div class="cw-title">
+              <i class="fa-solid fa-wand-magic-sparkles text-gold"></i>
+              <div>
+                <h4>Copywriter Imobiliário com IA (Gemini 2.5)</h4>
+                <p>Gere anúncios irresistíveis, títulos SEO e legendas para Instagram com 1 clique</p>
+              </div>
+            </div>
+            <div class="cw-controls">
+              <select id="copyPropertySelect">
+                <!-- Properties -->
+              </select>
+              <select id="copyToneSelect">
+                <option value="luxo">Tom: Alto Luxo & Exclusividade</option>
+                <option value="investidor">Tom: Foco em Retorno / Investidor</option>
+                <option value="familia">Tom: Conforto, Família & Estilo de Vida</option>
+              </select>
+              <button class="btn-gold" onclick="generateAiPropertyCopy()">
+                <i class="fa-solid fa-bolt"></i> Gerar Copy com IA
+              </button>
+            </div>
+          </div>
+
+          <div class="copywriter-results-grid">
+            <div class="cw-result-box">
+              <span class="cw-label">TÍTULO OTIMIZADO PARA PORTAIS (ZAP/VIVAREAL)</span>
+              <div class="cw-content" id="copyTitleResult">
+                Mansão Suspensa Frente Mar na Praia da Costa | 4 Suítes, 400m², Varanda Gourmet Panorâmica e 4 Vagas
+              </div>
+            </div>
+
+            <div class="cw-result-box">
+              <span class="cw-label">LEGENDA COMPLETA DO ANÚNCIO (PERSUASIVA & FORMATADA)</span>
+              <div class="cw-content scrollable" id="copyBodyResult">
+                Viva a experiência definitiva de morar de frente para o mar na localização mais nobre da Praia da Costa.<br/><br/>
+                Esta espetacular residência suspensa com 400m² privativos combina acabamento primoroso em mármore importado, marcenaria planejada de grife e uma vista indevassável para o oceano e o histórico Convento da Penha.<br/><br/>
+                ✨ <strong>Destaques do Imóvel:</strong><br/>
+                • 4 amplas suítes com closets (master com hidromassagem vista mar)<br/>
+                • Varanda gourmet climatizada integrada ao living monumental<br/>
+                • Cozinha de chef com ilha central e despensa<br/>
+                • 4 vagas soltas na garagem + box de praia privativo<br/>
+                • Lazer resort no condomínio: piscina com raia, quadra de tênis, sauna e spa<br/><br/>
+                Condomínio com portaria blindada e segurança 24 horas.<br/>
+                Agende sua visita exclusiva com atendimento privativo.
+              </div>
+            </div>
+
+            <div class="cw-result-box">
+              <span class="cw-label">POST PARA INSTAGRAM / REELS (COM HASHTAGS)</span>
+              <div class="cw-content" id="copySocialResult">
+                🌊 Acordar com o som das ondas na Praia da Costa não é um sonho: é a sua nova realidade.<br/><br/>
+                Apresento esta joia rara de 400m² privativos com 4 suítes e varanda gourmet cinematográfica. Um padrão construtivo que impressiona até os olhares mais exigentes.<br/><br/>
+                📲 Toque no link da bio para receber o book confidencial em PDF no WhatsApp.<br/><br/>
+                #ImoveisDeLuxo #PraiaDaCosta #VilaVelha #CoberturaDuplex #MansaoFrenteMar #MercadoImobiliarioDeLuxo
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: MODO VISITA (CAMPO / MOBILE DEDICADO) -->
+      <section id="view-modo-visita" class="view-panel">
+        <div class="modo-visita-wrapper">
+          <div class="modo-visita-explanation">
+            <div class="explanation-badge">
+              <i class="fa-solid fa-shield-cat text-amber"></i> USO EM CAMPO PELO CORRETOR
+            </div>
+            <h2>Ficha Confidencial & Modo Visita</h2>
+            <p>Tela projetada para ser consultada no celular pelo corretor durante a visita presencial ao imóvel. Reúne dados sigilosos que o cliente <strong>NÃO</strong> pode ver, facilitando a negociação em tempo real.</p>
+            
+            <div class="confidential-checklist">
+              <div class="conf-item"><i class="fa-solid fa-lock text-red"></i> <strong>Margem de Desconto:</strong> Valor mínimo real que o proprietário aceita no aperto</div>
+              <div class="conf-item"><i class="fa-solid fa-sack-dollar text-emerald"></i> <strong>Comissão Líquida:</strong> Valor exato da comissão da transação</div>
+              <div class="conf-item"><i class="fa-solid fa-key text-gold"></i> <strong>Acesso & Chaves:</strong> Localização das chaves e contato direto com o zelador</div>
+              <div class="conf-item"><i class="fa-solid fa-location-arrow text-blue"></i> <strong>Navegação:</strong> Botão 1-toque para traçar rota no Waze ou Google Maps</div>
+            </div>
+
+            <div class="property-selector-box">
+              <label for="modoVisitaPropertySelect">Trocar Imóvel da Visita:</label>
+              <select id="modoVisitaPropertySelect" onchange="updateModoVisitaView()">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Phone Mockup Container for Instant Visual Demonstration -->
+          <div class="phone-mockup-frame">
+            <div class="phone-speaker"></div>
+            <div class="phone-screen" id="phoneScreen">
+              <!-- Top bar inside phone -->
+              <div class="phone-status-bar">
+                <span>09:41</span>
+                <span><i class="fa-solid fa-signal"></i> 5G <i class="fa-solid fa-battery-full"></i></span>
+              </div>
+
+              <!-- Confidential Warning Banner inside Phone -->
+              <div class="phone-confidential-banner">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>SIGILOSO — NÃO MOSTRAR AO CLIENTE</span>
+              </div>
+
+              <!-- Phone Property Header Card -->
+              <div class="phone-card">
+                <img id="mvImage" src="assets/cena-1.jpg" alt="Imóvel" class="phone-prop-img" />
+                <div class="phone-prop-details">
+                  <h3 id="mvTitle">Mansão Frente Mar Praia da Costa</h3>
+                  <p class="phone-address" id="mvAddress"><i class="fa-solid fa-location-dot"></i> Av. Gil Veloso, 2100 - Praia da Costa</p>
+                  <div class="phone-price-tag" id="mvPublicPrice">R$ 3.800.000 (Valor de Anúncio)</div>
+                </div>
+              </div>
+
+              <!-- Confidential Negotiation Secrets -->
+              <div class="phone-card secret-card">
+                <div class="secret-header">
+                  <i class="fa-solid fa-user-secret text-red"></i>
+                  <h4>DADOS REAIS DE NEGOCIAÇÃO</h4>
+                </div>
+                
+                <div class="secret-metric">
+                  <span class="s-label">Margem Mínima Aceita:</span>
+                  <span class="s-value text-gold" id="mvMinPrice">R$ 3.500.000 à vista</span>
+                </div>
+                <div class="secret-note" id="mvProprietarioNote">
+                  "Proprietário aceita permuta até R$ 1.2M em apto 2 quartos em Itaparica para fechar este mês."
+                </div>
+
+                <div class="secret-metric">
+                  <span class="s-label">Comissão Líquida do Corretor:</span>
+                  <span class="s-value text-emerald" id="mvComissao">R$ 210.000 (6%)</span>
+                </div>
+
+                <div class="costs-split">
+                  <div><span>Condomínio:</span> <strong id="mvCondo">R$ 2.450/mês</strong></div>
+                  <div><span>IPTU Anual:</span> <strong id="mvIptu">R$ 4.200/ano</strong></div>
+                </div>
+              </div>
+
+              <!-- Key & Caretaker Action Buttons -->
+              <div class="phone-card">
+                <div class="secret-header">
+                  <i class="fa-solid fa-door-open text-blue"></i>
+                  <h4>LOGÍSTICA DE ACESSO</h4>
+                </div>
+                <div class="logistics-info">
+                  <p><i class="fa-solid fa-key"></i> <strong>Chaves:</strong> Portaria principal com o zelador <em>Sr. Sebastião</em>.</p>
+                  <p><i class="fa-solid fa-car"></i> <strong>Vagas:</strong> G2 - Números 41, 42, 43 e 44 (livres).</p>
+                </div>
+
+                <div class="phone-actions-grid">
+                  <a href="tel:+5527999887766" class="phone-btn btn-call-zelador">
+                    <i class="fa-solid fa-phone"></i> Ligar p/ Zelador
+                  </a>
+                  <a href="https://maps.google.com" target="_blank" class="phone-btn btn-waze">
+                    <i class="fa-solid fa-location-arrow"></i> Abrir Waze / Maps
+                  </a>
+                </div>
+              </div>
+
+              <!-- Quick Post-Visit Feedback -->
+              <div class="phone-card">
+                <h4><i class="fa-regular fa-clipboard"></i> Feedback Rápido da Visita</h4>
+                <div class="feedback-temperatures">
+                  <button class="temp-btn hot" onclick="recordVisitFeedback('quente')"><i class="fa-solid fa-fire"></i> Adorou</button>
+                  <button class="temp-btn warm" onclick="recordVisitFeedback('morno')"><i class="fa-solid fa-thumbs-up"></i> Gostou</button>
+                  <button class="temp-btn cold" onclick="recordVisitFeedback('frio')"><i class="fa-solid fa-snowflake"></i> Não curtiu</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: ESTEIRA DE CRÉDITO & FINANCIAMENTO -->
+      <section id="view-credito" class="view-panel">
+        <div class="credito-layout">
+          <!-- Credit Calculator Form -->
+          <div class="credito-calc-card">
+            <div class="calc-header">
+              <h3><i class="fa-solid fa-calculator text-gold"></i> Simulador Bancário Multibancos (Caixa & Itaú)</h3>
+              <p>Simulação em tempo real para apresentar na mesa de negociação</p>
+            </div>
+
+            <div class="calc-form">
+              <div class="form-group">
+                <label for="creditoValorImovel">Valor do Imóvel (R$):</label>
+                <input type="number" id="creditoValorImovel" value="3500000" step="50000" oninput="calculateFinancing()" />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="creditoEntradaPercent">Entrada (%):</label>
+                  <input type="range" id="creditoEntradaPercent" min="20" max="80" value="20" step="5" oninput="syncEntradaRange(this.value)" />
+                  <div class="range-display"><span id="entradaPercentLabel">20%</span> &rarr; <strong id="entradaValorLabel">R$ 700.000</strong></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="creditoPrazoAnos">Prazo (Anos):</label>
+                  <select id="creditoPrazoAnos" onchange="calculateFinancing()">
+                    <option value="35">35 anos (420 meses)</option>
+                    <option value="30" selected>30 anos (360 meses)</option>
+                    <option value="25">25 anos (300 meses)</option>
+                    <option value="20">20 anos (240 meses)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="creditoTaxaJuros">Taxa de Juros Efetiva (% a.a.):</label>
+                  <input type="number" id="creditoTaxaJuros" value="10.49" step="0.1" oninput="calculateFinancing()" />
+                </div>
+
+                <div class="form-group">
+                  <label for="creditoSistema">Sistema de Amortização:</label>
+                  <select id="creditoSistema" onchange="calculateFinancing()">
+                    <option value="SAC" selected>SAC (Parcelas Decrescentes - Recomendado)</option>
+                    <option value="PRICE">PRICE (Parcelas Fixas)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="calculateFinancing()">
+                <i class="fa-solid fa-arrows-rotate"></i> Recalcular Simulação
+              </button>
+            </div>
+          </div>
+
+          <!-- Financing Results Display -->
+          <div class="credito-results-card">
+            <div class="results-header">
+              <h4>Resultado da Simulação</h4>
+              <span class="badge badge-emerald">Crédito Pré-Aprovável</span>
+            </div>
+
+            <div class="results-highlights-grid">
+              <div class="highlight-item">
+                <span class="hl-label">1ª Parcela Estimada:</span>
+                <strong class="hl-value text-gold" id="calcPrimeiraParcela">R$ 32.240</strong>
+              </div>
+
+              <div class="highlight-item">
+                <span class="hl-label">Última Parcela (SAC):</span>
+                <strong class="hl-value text-emerald" id="calcUltimaParcela">R$ 7.840</strong>
+              </div>
+
+              <div class="highlight-item">
+                <span class="hl-label">Renda Familiar Mínima:</span>
+                <strong class="hl-value text-blue" id="calcRendaMinima">R$ 107.460</strong>
+                <span class="hl-sub">Comprometimento máx. de 30%</span>
+              </div>
+
+              <div class="highlight-item">
+                <span class="hl-label">Valor Total Financiado:</span>
+                <strong class="hl-value" id="calcValorFinanciado">R$ 2.800.000</strong>
+              </div>
+            </div>
+
+            <!-- Pre-qualification pipeline checklist -->
+            <div class="credit-checklist-card">
+              <h5><i class="fa-solid fa-list-check text-gold"></i> Checklist de Elegibilidade Bancária</h5>
+              <div class="checklist-items">
+                <label class="check-item"><input type="checkbox" checked /> Não possui restrições no Serasa/CADIN</label>
+                <label class="check-item"><input type="checkbox" checked /> Renda comprovada por Imposto de Renda</label>
+                <label class="check-item"><input type="checkbox" checked /> Entrada mínima de 20% disponível</label>
+                <label class="check-item"><input type="checkbox" /> Uso de FGTS como amortização da entrada</label>
+              </div>
+
+              <button class="btn-secondary" style="margin-top: 15px; width: 100%;" onclick="sendFinancingViaWhatsApp()">
+                <i class="fa-brands fa-whatsapp text-emerald"></i> Enviar Estudo Financeiro em PDF para o Cliente
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 8: GESTÃO DOCUMENTAL & ASSINATURA DIGITAL -->
+      <section id="view-documentos" class="view-panel">
+        <div class="documentos-header">
+          <div>
+            <h3>Gestão Documental & Assinatura Eletrônica</h3>
+            <p>Esteira digital integrada com ZapSign e ClickSign para fechamento ágil e seguro de contratos</p>
+          </div>
+          <button class="btn-primary" onclick="openNewContractModal()">
+            <i class="fa-solid fa-plus"></i> Gerar Novo Contrato
+          </button>
+        </div>
+
+        <div class="docs-pipeline-grid">
+          <!-- Active Digital Contracts -->
+          <div class="docs-card">
+            <div class="docs-card-header">
+              <h4><i class="fa-solid fa-file-contract text-emerald"></i> Contratos em Assinatura Digital</h4>
+              <span class="badge badge-emerald">ZapSign Integrado</span>
+            </div>
+
+            <div class="contracts-list" id="contractsList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Document Checklist for Active Deal -->
+          <div class="docs-card">
+            <div class="docs-card-header">
+              <div>
+                <h4><i class="fa-solid fa-folder-open text-gold"></i> Checklist Documental do Negócio</h4>
+                <p class="text-muted">Mansão Praia da Costa — Comprador: Dr. Eduardo Albuquerque</p>
+              </div>
+              <span class="badge badge-blue">80% Completo</span>
+            </div>
+
+            <div class="docs-checklist-body">
+              <div class="doc-party-group">
+                <h5>DOCUMENTOS DO COMPRADOR</h5>
+                <div class="doc-row checked">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span>RG / CNH e CPF dos Compradores</span>
+                  <span class="doc-status validated">Validado</span>
+                </div>
+                <div class="doc-row checked">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span>Certidão de Casamento Atualizada</span>
+                  <span class="doc-status validated">Validado</span>
+                </div>
+                <div class="doc-row checked">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span>Comprovante de Residência recente</span>
+                  <span class="doc-status validated">Validado</span>
+                </div>
+                <div class="doc-row pending">
+                  <i class="fa-regular fa-circle text-amber"></i>
+                  <span>Declaração de IRPF + Recibo de Entrega</span>
+                  <button class="btn-micro" onclick="requestDocumentByWhatsApp('IRPF')">Cobrar via Zap</button>
+                </div>
+              </div>
+
+              <div class="doc-party-group">
+                <h5>DOCUMENTOS DO IMÓVEL & VENDEDOR</h5>
+                <div class="doc-row checked">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span>Certidão de Ônus Reais (Válida por 30 dias)</span>
+                  <span class="doc-status validated">Validado</span>
+                </div>
+                <div class="doc-row checked">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span>Certidão Negativa de IPTU e Taxa de Marinha</span>
+                  <span class="doc-status validated">Validado</span>
+                </div>
+                <div class="doc-row checked">
+                  <i class="fa-solid fa-circle-check text-emerald"></i>
+                  <span>Declaração de Quitação Condominial assinada pelo síndico</span>
+                  <span class="doc-status validated">Validado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 9: BI, ROI & AVM (INTELIGÊNCIA DE MERCADO) -->
+      <section id="view-bi-avm" class="view-panel">
+        <div class="bi-grid">
+          <!-- Portals ROI & CPL -->
+          <div class="bi-card">
+            <div class="bi-header">
+              <h4><i class="fa-solid fa-chart-column text-blue"></i> Desempenho & Custo por Lead (CPL) por Canal</h4>
+              <span class="badge badge-emerald">ROI Médio: 18.4x</span>
+            </div>
+            <div class="portal-roi-table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Canal</th>
+                    <th>Investimento</th>
+                    <th>Leads</th>
+                    <th>CPL</th>
+                    <th>Visitas</th>
+                    <th>VGV Vendido</th>
+                    <th>ROI</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>ZAP Imóveis</strong></td>
+                    <td>R$ 4.200</td>
+                    <td>94</td>
+                    <td>R$ 44,68</td>
+                    <td>18</td>
+                    <td>R$ 7.6M</td>
+                    <td><span class="badge badge-emerald">21.7x</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>VivaReal</strong></td>
+                    <td>R$ 2.800</td>
+                    <td>71</td>
+                    <td>R$ 39,43</td>
+                    <td>12</td>
+                    <td>R$ 3.8M</td>
+                    <td><span class="badge badge-emerald">16.2x</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Meta Ads (Instagram)</strong></td>
+                    <td>R$ 3.500</td>
+                    <td>112</td>
+                    <td>R$ 31,25</td>
+                    <td>14</td>
+                    <td>R$ 4.5M</td>
+                    <td><span class="badge badge-emerald">15.4x</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Site Direto (Scrolly)</strong></td>
+                    <td>R$ 900</td>
+                    <td>42</td>
+                    <td>R$ 21,42</td>
+                    <td>16</td>
+                    <td>R$ 5.2M</td>
+                    <td><span class="badge badge-gold">69.3x</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Motivos de Perda de Negócios -->
+          <div class="bi-card">
+            <div class="bi-header">
+              <h4><i class="fa-solid fa-circle-exclamation text-red"></i> Análise de Negócios Perdidos</h4>
+              <span class="badge badge-amber">Feedback Real de Clientes</span>
+            </div>
+            <div class="losses-breakdown">
+              <div class="loss-bar-item">
+                <div class="loss-meta">
+                  <span>Preço acima da avaliação de mercado (AVM)</span>
+                  <strong>42% dos desinteresses</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill bg-red" style="width: 42%;"></div></div>
+              </div>
+              <div class="loss-bar-item">
+                <div class="loss-meta">
+                  <span>Vagas insuficientes ou difíceis de manobrar</span>
+                  <strong>24% dos desinteresses</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill bg-amber" style="width: 24%;"></div></div>
+              </div>
+              <div class="loss-bar-item">
+                <div class="loss-meta">
+                  <span>Condomínio excessivamente alto</span>
+                  <strong>18% dos desinteresses</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill bg-blue" style="width: 18%;"></div></div>
+              </div>
+              <div class="loss-bar-item">
+                <div class="loss-meta">
+                  <span>Vendedor não aceitou permuta como entrada</span>
+                  <strong>16% dos desinteresses</strong>
+                </div>
+                <div class="progress-track"><div class="progress-fill bg-purple" style="width: 16%;"></div></div>
+              </div>
+            </div>
+            <p class="text-muted text-sm mt-3"><i class="fa-solid fa-lightbulb text-gold"></i> Use esses dados para convencer o proprietário a baixar a pedida inicial e viabilizar a venda.</p>
+          </div>
+
+          <!-- AVM - Precificação Inteligente por m² -->
+          <div class="bi-card full-span">
+            <div class="bi-header">
+              <h4><i class="fa-solid fa-scale-balanced text-gold"></i> AVM (Automated Valuation Model) — Inteligência de Preço por m²</h4>
+              <span class="badge badge-gold">Base Cartorial & Portais Vila Velha</span>
+            </div>
+
+            <div class="avm-neighborhoods-grid">
+              <div class="avm-card">
+                <div class="avm-bairro">Praia da Costa (Orla / 1ª Quadra)</div>
+                <div class="avm-price">R$ 13.800 <small>/ m²</small></div>
+                <div class="avm-stats">
+                  <span>Média Alto Padrão: R$ 12.500 - R$ 16.000/m²</span>
+                  <span class="badge badge-emerald">Alta Liquidez</span>
+                </div>
+              </div>
+
+              <div class="avm-card">
+                <div class="avm-bairro">Praia de Itaparica (Frente Mar)</div>
+                <div class="avm-price">R$ 9.850 <small>/ m²</small></div>
+                <div class="avm-stats">
+                  <span>Média Alto Padrão: R$ 8.900 - R$ 11.500/m²</span>
+                  <span class="badge badge-blue">Maior Valorização (+14% a.a.)</span>
+                </div>
+              </div>
+
+              <div class="avm-card">
+                <div class="avm-bairro">Praia de Itapuã (Triângulo das Bermudas)</div>
+                <div class="avm-price">R$ 11.200 <small>/ m²</small></div>
+                <div class="avm-stats">
+                  <span>Média Alto Padrão: R$ 10.000 - R$ 12.800/m²</span>
+                  <span class="badge badge-emerald">Procura Constante</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- MODAL: XML EXPORT PREVIEW -->
+  <div class="modal-overlay" id="xmlModal">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-code text-blue"></i> Feed XML Padrão Portais (ZAP / VivaReal / Imovelweb)</h3>
+        <button class="modal-close" onclick="closeModal('xmlModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">Este feed é gerado em tempo real e consumido automaticamente pelas APIs dos portais a cada 30 minutos.</p>
+        <pre class="code-preview" id="xmlContentPreview"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="copyXmlFeed()">Copiar XML</button>
+        <button class="btn-primary" onclick="downloadXmlFeed()">Baixar feed.xml</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SIMULATE NEW LEAD ARRIVAL -->
+  <div class="modal-overlay" id="newLeadModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bolt-lightning text-gold"></i> Simulação: Entrada de Lead no ZAP Imóveis</h3>
+        <button class="modal-close" onclick="closeModal('newLeadModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Preencha os dados do lead de teste para disparar o webhook multicanal, o rodízio e o contador SLA de 5 minutos:</p>
+        <div class="form-group">
+          <label>Nome Completo do Cliente:</label>
+          <input type="text" id="simLeadName" value="Dra. Luciana Paes" />
+        </div>
+        <div class="form-group">
+          <label>WhatsApp:</label>
+          <input type="text" id="simLeadPhone" value="(27) 99777-8899" />
+        </div>
+        <div class="form-group">
+          <label>Imóvel de Interesse:</label>
+          <select id="simLeadProperty">
+            <option value="Cobertura Duplex Praia de Itaparica">Cobertura Duplex Praia de Itaparica - R$ 3.2M</option>
+            <option value="Mansão Frente Mar Praia da Costa">Mansão Frente Mar Praia da Costa - R$ 3.8M</option>
+            <option value="Apartamento Design Itapuã">Apartamento Design Itapuã - R$ 2.4M</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('newLeadModal')">Cancelar</button>
+        <button class="btn-gold" onclick="submitSimulatedLead()">
+          <i class="fa-solid fa-bolt"></i> Disparar Webhook & Iniciar SLA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SCHEDULE VISIT -->
+  <div class="modal-overlay" id="scheduleModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-regular fa-calendar-check text-blue"></i> Agendar Visita com Cliente</h3>
+        <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Data da Visita:</label>
+          <input type="date" id="visitDate" value="2026-09-20" />
+        </div>
+        <div class="form-group">
+          <label>Horário:</label>
+          <input type="time" id="visitTime" value="10:00" />
+        </div>
+        <div class="form-group">
+          <label>Corretor Acompanhante:</label>
+          <input type="text" value="Roberto Mantovani" readonly />
+        </div>
+        <div class="form-group">
+          <label>Avisar Zelador pelo WhatsApp:</label>
+          <label class="switch"><input type="checkbox" checked /><span class="slider round"></span></label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('scheduleModal')">Cancelar</button>
+        <button class="btn-primary" onclick="confirmScheduledVisit()">
+          <i class="fa-solid fa-check"></i> Confirmar & Integrar no Google Agenda
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar (App-Like Experience) -->
+  <nav class="mobile-bottom-nav">
+    <button class="mob-nav-btn active" onclick="switchTab('dashboard')" data-mob-tab="dashboard">
+      <i class="fa-solid fa-chart-line"></i>
+      <span>Dashboard</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchTab('kanban')" data-mob-tab="kanban">
+      <i class="fa-solid fa-table-columns"></i>
+      <span>Kanban</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchTab('whatsapp')" data-mob-tab="whatsapp">
+      <i class="fa-brands fa-whatsapp text-emerald"></i>
+      <span>WhatsApp</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchTab('matchmaker')" data-mob-tab="matchmaker">
+      <i class="fa-solid fa-wand-magic-sparkles text-gold"></i>
+      <span>Match</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchTab('modo-visita')" data-mob-tab="modo-visita">
+      <i class="fa-solid fa-key text-amber"></i>
+      <span>Visita</span>
+    </button>
+  </nav>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
