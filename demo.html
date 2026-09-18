@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ImobIA — Demonstração de Pré-Atendimento Imobiliário 24/7</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* ==========================================================================
+       DEMO IMOBIA - WHATSAPP PRE-SERVICE EXPERIENCE (WARM LUXURY & NATIVE WA)
+       ========================================================================== */
+    :root {
+      --bg-app: #0c0b0a;
+      --bg-chat-header: #141311;
+      --bg-chat-body: #0d0c0b;
+      --bg-input-bar: #141311;
+      --bubble-in: #1c1b18;
+      --bubble-out: #0d2820;
+      --bubble-out-border: rgba(52, 211, 153, 0.25);
+      --border-subtle: rgba(245, 238, 225, 0.08);
+      --border-light: rgba(245, 238, 225, 0.15);
+      --gold-primary: #d4a373;
+      --gold-light: #f5ebe0;
+      --emerald-primary: #25d366;
+      --emerald-accent: #34d399;
+      --text-primary: #faf8f5;
+      --text-secondary: #a8a29e;
+      --text-muted: #78716c;
+      --shadow-ambient: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(212, 163, 115, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(52, 211, 153, 0.03) 0%, transparent 40%);
+    }
+
+    /* Top Broker Notice Banner */
+    .demo-top-bar {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(20, 19, 17, 0.95);
+      border: 1px solid var(--border-subtle);
+      border-bottom: none;
+      border-radius: 20px 20px 0 0;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .demo-badge-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold-primary);
+      font-weight: 600;
+    }
+
+    .btn-reset-demo {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .btn-reset-demo:hover {
+      color: var(--text-primary);
+      border-color: var(--gold-primary);
+    }
+
+    /* Main Phone / Chat Mockup Container */
+    .chat-mockup-wrapper {
+      width: 100%;
+      max-width: 520px;
+      height: 90vh;
+      max-height: 840px;
+      background: var(--bg-chat-body);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0 0 24px 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-ambient);
+      overflow: hidden;
+      position: relative;
+    }
+
+    @media (max-width: 540px) {
+      body {
+        justify-content: flex-start;
+      }
+      .demo-top-bar {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+      .chat-mockup-wrapper {
+        max-width: 100%;
+        height: calc(100vh - 42px);
+        max-height: none;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+      }
+    }
+
+    /* WhatsApp Header */
+    .chat-header {
+      background: var(--bg-chat-header);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 10;
+    }
+
+    .chat-header-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-box {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--gold-primary);
+      flex-shrink: 0;
+    }
+
+    .avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .status-online-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 11px;
+      height: 11px;
+      background: var(--emerald-primary);
+      border-radius: 50%;
+      border: 2px solid var(--bg-chat-header);
+    }
+
+    .profile-info h3 {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .profile-info h3 i.fa-circle-check {
+      color: var(--emerald-primary);
+      font-size: 0.82rem;
+    }
+
+    .profile-info p {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .profile-info p .typing-text {
+      color: var(--emerald-primary);
+      font-weight: 600;
+      display: none;
+    }
+
+    .chat-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-crm-drawer {
+      background: rgba(212, 163, 115, 0.12);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-light);
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-crm-drawer:hover {
+      background: var(--gold-primary);
+      color: #0c0b0a;
+    }
+
+    /* Scenario Quick Chips Tray */
+    .scenarios-tray {
+      background: rgba(16, 15, 13, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      z-index: 5;
+    }
+
+    .scenarios-tray::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scenario-chip {
+      background: rgba(28, 27, 24, 0.9);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.74rem;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .scenario-chip:hover, .scenario-chip.active {
+      background: rgba(212, 163, 115, 0.15);
+      border-color: var(--gold-primary);
+      color: var(--text-primary);
+    }
+
+    /* Chat Messages Stream Area */
+    .chat-messages-area {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: var(--bg-chat-body);
+      background-image: radial-gradient(rgba(245, 238, 225, 0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .date-separator {
+      align-self: center;
+      background: rgba(28, 27, 24, 0.85);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin: 4px 0 8px;
+    }
+
+    /* Message Bubbles */
+    .msg-bubble {
+      max-width: 84%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      position: relative;
+      animation: msgPop 0.25s ease-out;
+      word-wrap: break-word;
+    }
+
+    @keyframes msgPop {
+      from { opacity: 0; transform: translateY(6px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Incoming (User / Buyer) */
+    .msg-in {
+      align-self: flex-start;
+      background: var(--bubble-in);
+      border: 1px solid var(--border-subtle);
+      border-top-left-radius: 4px;
+      color: var(--text-primary);
+    }
+
+    /* Outgoing (ImobIA) */
+    .msg-out {
+      align-self: flex-end;
+      background: var(--bubble-out);
+      border: 1px solid var(--bubble-out-border);
+      border-top-right-radius: 4px;
+      color: #faf8f5;
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .msg-out .msg-meta {
+      color: rgba(250, 248, 245, 0.55);
+    }
+
+    .msg-out .msg-meta i.fa-check-double {
+      color: #38bdf8;
+    }
+
+    /* Audio Bubble Player */
+    .audio-player-bubble {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0;
+      min-width: 230px;
+    }
+
+    .btn-play-audio {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      color: #0c0b0a;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .btn-play-audio:hover {
+      transform: scale(1.05);
+    }
+
+    .audio-waveform-bars {
+      display: flex;
+      align-items: center;
+      gap: 2.5px;
+      flex: 1;
+      height: 24px;
+    }
+
+    .wave-bar {
+      width: 3px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      transition: height 0.2s;
+    }
+
+    .wave-bar.active {
+      background: var(--gold-primary);
+    }
+
+    .audio-duration {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .audio-transcript-box {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .audio-transcript-box strong {
+      font-style: normal;
+      color: var(--gold-primary);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* Property Card Inside Chat */
+    .property-chat-card {
+      background: rgba(16, 15, 13, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 8px 0 4px;
+    }
+
+    .property-chat-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .property-card-content {
+      padding: 10px 12px;
+    }
+
+    .property-card-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+    }
+
+    .property-card-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 2px 0 4px;
+    }
+
+    .property-card-features {
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Google Calendar Invitation Card */
+    .calendar-event-card {
+      background: rgba(16, 15, 13, 0.92);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 6px 0;
+    }
+
+    .cal-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    .cal-meta-row {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .cal-button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .cal-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .cal-btn-google {
+      background: rgba(52, 211, 153, 0.15);
+      border: 1px solid var(--emerald-accent);
+      color: #faf8f5;
+    }
+
+    .cal-btn-waze {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid #38bdf8;
+      color: #faf8f5;
+    }
+
+    /* Typing Animation */
+    .typing-indicator-bubble {
+      display: none;
+      align-self: flex-start;
+      background: var(--bubble-in);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 10px 16px;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-indicator-bubble.active {
+      display: inline-flex;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--emerald-primary);
+      border-radius: 50%;
+      animation: typingBounce 1.3s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* Bottom Message Input Bar */
+    .chat-input-bar {
+      background: var(--bg-input-bar);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-attach {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .chat-input-field {
+      flex: 1;
+      background: #1c1b18;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 10px 16px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .chat-input-field:focus {
+      border-color: var(--gold-primary);
+    }
+
+    .btn-send-wa {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--emerald-primary);
+      color: #0c0b0a;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .btn-send-wa:hover {
+      transform: scale(1.05);
+    }
+
+    /* Retractable CRM Raio-X Modal / Drawer */
+    .crm-drawer-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .crm-drawer-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .crm-drawer-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #141311;
+      border-top: 2px solid var(--gold-primary);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 75%;
+      overflow-y: auto;
+    }
+
+    .crm-drawer-backdrop.active .crm-drawer-content {
+      transform: translateY(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 10px;
+    }
+
+    .drawer-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-close-drawer {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .crm-audit-item {
+      background: #1c1b18;
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--gold-primary);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+
+    .crm-audit-item .audit-time {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .crm-audit-item strong {
+      color: var(--text-primary);
+      display: block;
+      margin: 2px 0;
+    }
+
+    .crm-audit-item p {
+      color: var(--text-secondary);
+      font-size: 0.76rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Helper Bar for Brokers -->
+  <header class="demo-top-bar">
+    <div class="demo-badge-info">
+      <i class="fa-solid fa-bolt text-gold"></i>
+      <span>Demo ImobIA: Pré-Atendimento 24/7</span>
+    </div>
+    <button class="btn-reset-demo" onclick="resetDemoChat()">
+      <i class="fa-solid fa-rotate-right"></i> Reiniciar Conversa
+    </button>
+  </header>
+
+  <!-- WhatsApp Chat Container -->
+  <main class="chat-mockup-wrapper">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="chat-header-profile">
+        <div class="avatar-box">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&auto=format&fit=crop&q=80" alt="ImobIA" />
+          <div class="status-online-dot"></div>
+        </div>
+        <div class="profile-info">
+          <h3>ImobIA <i class="fa-solid fa-circle-check"></i></h3>
+          <p>
+            <span class="status-text">Online • Atendimento Imobiliário</span>
+            <span class="typing-text" id="typingStatus">gravando áudio...</span>
+          </p>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="btn-crm-drawer" onclick="toggleCrmDrawer(true)">
+          <i class="fa-solid fa-terminal"></i> <span>Ver CRM</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Scenarios Pill Bar -->
+    <div class="scenarios-tray">
+      <button class="scenario-chip" onclick="triggerScenario('audio')">
+        <i class="fa-solid fa-microphone text-emerald"></i> Simular Áudio (Dr. Eduardo)
+      </button>
+      <button class="scenario-chip" onclick="triggerScenario('permuta')">
+        <i class="fa-solid fa-arrows-rotate text-blue"></i> Dúvida sobre Permuta
+      </button>
+      <button class="scenario-chip" onclick="triggerScenario('financiamento')">
+        <i class="fa-solid fa-calculator text-purple"></i> Simulação Caixa SAC
+      </button>
+      <button class="scenario-chip" onclick="triggerScenario('visita')">
+        <i class="fa-regular fa-calendar-check text-gold"></i> Agendar Visita Sábado
+      </button>
+      <button class="scenario-chip" onclick="triggerScenario('deed')">
+        <i class="fa-solid fa-file-shield text-gold"></i> Enviar Matrícula (PDF)
+      </button>
+    </div>
+
+    <!-- Chat Messages Stream -->
+    <div class="chat-messages-area" id="chatArea">
+      <div class="date-separator">HOJE</div>
+
+      <!-- Welcome Message from Agent -->
+      <div class="msg-bubble msg-out">
+        Olá! Seja muito bem-vindo à <strong>Velox Imóveis</strong>. Sou o <strong>ImobIA</strong>, consultor digital exclusivo de imóveis de alto padrão em Vila Velha e Vitória.<br><br>
+        Como posso ajudar você hoje? Você busca uma opção para moradia imediata ou investimento na orla?
+        <div class="msg-meta">
+          <span>09:30</span>
+          <i class="fa-solid fa-check-double"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typing Indicator Bubble -->
+    <div class="typing-indicator-bubble" id="typingBubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+
+    <!-- Message Input Bar -->
+    <form class="chat-input-bar" id="chatForm" onsubmit="handleUserSubmit(event)">
+      <button type="button" class="btn-attach" onclick="triggerScenario('audio')" title="Simular Áudio">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <input type="text" id="userInput" class="chat-input-field" placeholder="Digite uma mensagem..." autocomplete="off" />
+      <button type="submit" class="btn-send-wa">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
+
+    <!-- Drawer: O que o ImobIA fez no CRM -->
+    <div class="crm-drawer-backdrop" id="crmDrawer" onclick="toggleCrmDrawer(false)">
+      <div class="crm-drawer-content" onclick="event.stopPropagation()">
+        <div class="drawer-header">
+          <div class="drawer-title">
+            <i class="fa-solid fa-network-wired"></i>
+            <span>Raio-X: Integração com o VELOX CRM</span>
+          </div>
+          <button class="btn-close-drawer" onclick="toggleCrmDrawer(false)">&times;</button>
+        </div>
+
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:12px;">
+          Enquanto o comprador conversa pelo WhatsApp, o <strong>ImobIA</strong> trabalha nos bastidores do CRM de forma 100% autônoma:
+        </p>
+
+        <div id="crmAuditList">
+          <div class="crm-audit-item">
+            <div class="audit-time">09:30:00 • META CLOUD API</div>
+            <strong>Webhook de Entrada Ativo</strong>
+            <p>Conexão oficial da Meta iniciou a sessão e registrou o contato na fila de Speed to Lead.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; text-align: center;">
+          <a href="index.html#kanban" target="_blank" style="color:var(--gold-primary); font-size:0.8rem; text-decoration:none; font-weight:600;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Painel Completo do CRM
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ==========================================================================
+    // DEMO IMOBIA ENGINE
+    // ==========================================================================
+
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const typingBubble = document.getElementById('typingBubble');
+    const typingStatus = document.getElementById('typingStatus');
+    const crmAuditList = document.getElementById('crmAuditList');
+
+    function toggleCrmDrawer(show) {
+      document.getElementById('crmDrawer').classList.toggle('active', show);
+    }
+
+    function addAuditLog(type, title, detail) {
+      const now = new Date();
+      const time = now.toTimeString().split(' ')[0];
+      const el = document.createElement('div');
+      el.className = 'crm-audit-item';
+      el.innerHTML = `
+        <div class="audit-time">${time} • ${type}</div>
+        <strong>${title}</strong>
+        <p>${detail}</p>
+      `;
+      crmAuditList.prepend(el);
+    }
+
+    function showTyping(isAudio = false) {
+      typingBubble.classList.add('active');
+      typingStatus.textContent = isAudio ? 'gravando áudio...' : 'digitando...';
+      typingStatus.style.display = 'inline';
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function hideTyping() {
+      typingBubble.classList.remove('active');
+      typingStatus.style.display = 'none';
+    }
+
+    function getTimeStr() {
+      const now = new Date();
+      return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
+    function appendUserMessage(html) {
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble msg-in';
+      bubble.innerHTML = `${html}<div class="msg-meta"><span>${getTimeStr()}</span></div>`;
+      chatArea.appendChild(bubble);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function appendAgentMessage(html) {
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble msg-out';
+      bubble.innerHTML = `${html}<div class="msg-meta"><span>${getTimeStr()}</span><i class="fa-solid fa-check-double"></i></div>`;
+      chatArea.appendChild(bubble);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Handle Manual User Text
+    function handleUserSubmit(e) {
+      e.preventDefault();
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      appendUserMessage(text);
+      userInput.value = '';
+
+      // Analyze intent and respond
+      const lower = text.toLowerCase();
+      showTyping(false);
+
+      setTimeout(() => {
+        hideTyping();
+
+        if (lower.includes('preco') || lower.includes('preço') || lower.includes('valor') || lower.includes('quanto')) {
+          appendAgentMessage(
+            "Temos opções excepcionais frente mar na Praia da Costa e Itaparica de <strong>R$ 2.4M até R$ 4.0M</strong>. " +
+            "A Mansão Frente Mar que é o nosso grande destaque da semana está precificada em R$ 3.800.000 (com margem de negociação à vista). " +
+            "Gostaria de ver as fotos da varanda e a planta?"
+          );
+          addAuditLog('QUALIFICAÇÃO IA', 'Detecção de Orçamento', 'Cliente perguntou valores. Identificado interesse em R$ 2.4M - R$ 3.8M.');
+        } else if (lower.includes('permuta') || lower.includes('troca') || lower.includes('apto menor')) {
+          appendAgentMessage(
+            "O proprietário analisa sim permuta por apartamento menor na Praia da Costa ou Itaparica até <strong>R$ 1.2M</strong> como parte do pagamento. " +
+            "Quantos quartos tem o seu imóvel atual e qual condomínio?"
+          );
+          addAuditLog('NEGOCIAÇÃO', 'Aceite de Permuta', 'Registrada intenção de permuta no CRM. Ficha do lead enriquecida.');
+        } else if (lower.includes('visita') || lower.includes('sabado') || lower.includes('sábado') || lower.includes('agendar') || lower.includes('horario') || lower.includes('horário')) {
+          triggerScenario('visita_reply');
+        } else if (lower.includes('financiamento') || lower.includes('caixa') || lower.includes('banco')) {
+          triggerScenario('financiamento_reply');
+        } else {
+          appendAgentMessage(
+            "Compreendi perfeitamente! Como consultor exclusivo da Velox, estou à disposição para lhe passar todos os detalhes reservados do imóvel, " +
+            "incluindo custos de condomínio, IPTU e possibilidades de pagamento. Você prefere falar por aqui ou agendar uma visita presencial para conhecer o condomínio?"
+          );
+          addAuditLog('INTERAÇÃO 24/7', 'Atendimento Natural Multimodal', 'ImobIA conduziu a qualificação com cordialidade e foco em visita.');
+        }
+      }, 1200);
+    }
+
+    // Pre-built Demo Scenarios
+    function triggerScenario(type) {
+      if (type === 'audio') {
+        // User sends audio
+        appendUserMessage(`
+          <div class="audio-player-bubble">
+            <button class="btn-play-audio" onclick="playMockAudio(this)">
+              <i class="fa-solid fa-play"></i>
+            </button>
+            <div class="audio-waveform-bars">
+              <div class="wave-bar" style="height:10px;"></div>
+              <div class="wave-bar" style="height:18px;"></div>
+              <div class="wave-bar" style="height:12px;"></div>
+              <div class="wave-bar" style="height:22px;"></div>
+              <div class="wave-bar" style="height:15px;"></div>
+              <div class="wave-bar" style="height:20px;"></div>
+              <div class="wave-bar" style="height:8px;"></div>
+              <div class="wave-bar" style="height:16px;"></div>
+              <div class="wave-bar" style="height:24px;"></div>
+              <div class="wave-bar" style="height:14px;"></div>
+              <div class="wave-bar" style="height:19px;"></div>
+              <div class="wave-bar" style="height:11px;"></div>
+            </div>
+            <span class="audio-duration">0:18</span>
+          </div>
+          <div class="audio-transcript-box">
+            <strong>Transcrição Automática (Gemini 2.5 Flash):</strong>
+            "Olá Roberto, aqui é o Dr. Eduardo. Vi o anúncio da Mansão Frente Mar na Praia da Costa. Minha família precisa de 4 vagas e temos dois labradores. O proprietário avalia permuta por um 3 quartos meu de 1.2M? Se der negócio, posso visitar no sábado às 10h."
+          </div>
+        `);
+
+        addAuditLog('CADASTRO AUTOMÁTICO', 'Novo Lead Registrado via Áudio', 'Dr. Eduardo Albuquerque cadastrado no CRM. Orçamento: R$ 3.8M | 4 vagas | Permuta.');
+
+        showTyping(true);
+        setTimeout(() => {
+          hideTyping();
+          appendAgentMessage(`
+            Excelente áudio, Dr. Eduardo! Ouvi com muita atenção. 
+            <br><br>
+            O condomínio é <strong>100% pet-friendly</strong> com área verde privativa e o apartamento conta com <strong>4 vagas soltas e cobertas</strong>. 
+            Sobre a sua permuta de R$ 1.2M, o proprietário já nos sinalizou positivamente para receber a proposta.
+            <br><br>
+            Conforme solicitado, acabei de reservar na agenda do corretor <strong>Roberto Mantovani</strong> o horário deste <strong>Sábado às 10h</strong>:
+            
+            <div class="calendar-event-card">
+              <div class="cal-title-row">
+                <i class="fa-regular fa-calendar-check text-emerald"></i>
+                <span>Visita Confirmada: Mansão Frente Mar</span>
+              </div>
+              <div class="cal-meta-row">
+                📅 <strong>Sábado, 20 de Setembro às 10:00</strong><br>
+                📍 Av. Antônio Gil Veloso, 2100 - Praia da Costa<br>
+                👤 Corretor: Roberto Mantovani (Top Producer)
+              </div>
+              <div class="cal-button-group">
+                <a href="https://calendar.google.com" target="_blank" class="cal-btn cal-btn-google">
+                  <i class="fa-brands fa-google"></i> Google Agenda
+                </a>
+                <a href="https://waze.com" target="_blank" class="cal-btn cal-btn-waze">
+                  <i class="fa-solid fa-location-arrow"></i> Rota no Waze
+                </a>
+              </div>
+            </div>
+          `);
+
+          addAuditLog('TRANSIÇÃO NO PIPELINE', 'Avanço Automático no Kanban', 'ImobIA moveu Dr. Eduardo de [Novo Lead] → [Visita Agendada].');
+          addAuditLog('GOOGLE CALENDAR', 'Evento Sincronizado', 'Visita inserida na agenda do corretor com notificação de rota Waze.');
+        }, 1800);
+
+      } else if (type === 'permuta') {
+        appendUserMessage("Vocês avaliam permuta por um imóvel de menor valor em Vila Velha?");
+        showTyping();
+        setTimeout(() => {
+          hideTyping();
+          appendAgentMessage(
+            "Sim! Na maioria das nossas captações exclusivas de alto padrão, temos proprietários flexíveis que aceitam imóveis de 2 ou 3 quartos " +
+            "na Praia da Costa e Itaparica até <strong>35% do valor total</strong> como dação em pagamento.<br><br>" +
+            "Para eu rodar a viabilidade agora mesmo no sistema: qual a metragem e o condomínio do seu imóvel atual?"
+          );
+          addAuditLog('MATCHER REVERSO', 'Varredura de Permuta', 'ImobIA consultou o banco de proprietários abertos a permuta na Praia da Costa.');
+        }, 1100);
+
+      } else if (type === 'financiamento' || type === 'financiamento_reply') {
+        if (type === 'financiamento') {
+          appendUserMessage("Como ficaria o financiamento pela Caixa para um imóvel de R$ 3.8 Milhões?");
+        }
+        showTyping();
+        setTimeout(() => {
+          hideTyping();
+          appendAgentMessage(`
+            Rodei agora o cálculo oficial na nossa esteira financeira bancária para a <strong>Mansão Frente Mar (R$ 3.800.000)</strong>:
+            <br><br>
+            💰 <strong>Entrada Sugerida (20%):</strong> R$ 760.000<br>
+            🏦 <strong>Financiamento (80%):</strong> R$ 3.040.000<br>
+            📉 <strong>Tabela SAC Caixa (Parcelas Decrescentes):</strong><br>
+            • 1ª Parcela: <strong>R$ 11.890 / mês</strong><br>
+            • Última Parcela: <strong>R$ 2.450 / mês</strong><br>
+            💼 <strong>Renda Familiar Mínima Recomendada:</strong> R$ 39.600<br><br>
+            Posso te enviar o PDF completo com a memória de cálculo por aqui?
+          `);
+          addAuditLog('ESTEIRA DE CRÉDITO', 'Simulação Caixa SAC Executada', 'Cálculo de R$ 3.8M anexado à ficha do cliente com margem de 30%.');
+        }, 1300);
+
+      } else if (type === 'visita' || type === 'visita_reply') {
+        if (type === 'visita') {
+          appendUserMessage("Gostaria de marcar uma visita neste sábado às 10h com a minha família.");
+        }
+        showTyping();
+        setTimeout(() => {
+          hideTyping();
+          appendAgentMessage(`
+            Perfeito! Horário reservado com prioridade na agenda do corretor <strong>Roberto Mantovani</strong>.
+            <br><br>
+            Já comuniquei a portaria e liberei as vagas de visitantes para o seu veículo.
+            
+            <div class="calendar-event-card">
+              <div class="cal-title-row">
+                <i class="fa-solid fa-calendar-check text-emerald"></i>
+                <span>Visita Confirmada: Mansão Frente Mar</span>
+              </div>
+              <div class="cal-meta-row">
+                📅 <strong>Sábado, 20 de Setembro • 10:00 às 11:00</strong><br>
+                📍 Av. Antônio Gil Veloso, 2100 - Praia da Costa<br>
+                🚗 Vagas nº 41 e 42 reservadas no subsolo.
+              </div>
+              <div class="cal-button-group">
+                <a href="https://calendar.google.com" target="_blank" class="cal-btn cal-btn-google">
+                  <i class="fa-brands fa-google"></i> Google Agenda
+                </a>
+                <a href="https://waze.com" target="_blank" class="cal-btn cal-btn-waze">
+                  <i class="fa-solid fa-location-arrow"></i> Rota no Waze
+                </a>
+              </div>
+            </div>
+            
+            Nos vemos no sábado! Qualquer imprevisto, estou à sua disposição 24 horas por aqui.
+          `);
+          addAuditLog('GOOGLE CALENDAR API', 'Agendamento Direto Realizado', 'Visita inserida no Google Calendar. Pipeline movido para [Visita Agendada].');
+        }, 1300);
+
+      } else if (type === 'deed') {
+        appendUserMessage(`
+          <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-file-pdf text-gold" style="font-size:1.8rem;"></i>
+            <div>
+              <strong>Matricula_64821_RGI.pdf</strong><br>
+              <span style="font-size:0.72rem; color:var(--text-muted);">PDF • 1.4 MB • Cartório 1º Ofício</span>
+            </div>
+          </div>
+        `);
+        showTyping();
+        setTimeout(() => {
+          hideTyping();
+          appendAgentMessage(`
+            Recebi a matrícula e processei a leitura do PDF com o módulo de auditoria documental.
+            <br><br>
+            ✅ <strong>Status Jurídico:</strong> 100% REGULAR / SEM ÔNUS.<br>
+            📄 <strong>Área Privativa:</strong> 398,50 m² averbada.<br>
+            🔒 <strong>Gravames:</strong> Hipoteca anterior cancelada via Av-5 em 14/03/2023. Não constam penhoras.<br>
+            ⚖️ <strong>Laudo ImobIA:</strong> Imóvel totalmente apto para escrituração e financiamento bancário imediato!
+          `);
+          addAuditLog('AUDITORIA JURÍDICA', 'Matrícula PDF Auditada', 'Matrícula 64.821 validada sem ônus reais ativos. Documento anexado ao CRM.');
+        }, 1600);
+      }
+    }
+
+    function playMockAudio(btn) {
+      const icon = btn.querySelector('i');
+      if (icon.classList.contains('fa-play')) {
+        icon.classList.remove('fa-play');
+        icon.classList.add('fa-pause');
+        setTimeout(() => {
+          icon.classList.remove('fa-pause');
+          icon.classList.add('fa-play');
+        }, 2500);
+      } else {
+        icon.classList.remove('fa-pause');
+        icon.classList.add('fa-play');
+      }
+    }
+
+    function resetDemoChat() {
+      chatArea.innerHTML = `
+        <div class="date-separator">HOJE</div>
+        <div class="msg-bubble msg-out">
+          Olá! Seja muito bem-vindo à <strong>Velox Imóveis</strong>. Sou o <strong>ImobIA</strong>, consultor digital exclusivo de imóveis de alto padrão em Vila Velha e Vitória.<br><br>
+          Como posso ajudar você hoje? Você busca uma opção para moradia imediata ou investimento na orla?
+          <div class="msg-meta">
+            <span>09:30</span>
+            <i class="fa-solid fa-check-double"></i>
+          </div>
+        </div>
+      `;
+      crmAuditList.innerHTML = `
+        <div class="crm-audit-item">
+          <div class="audit-time">09:30:00 • META CLOUD API</div>
+          <strong>Webhook de Entrada Ativo</strong>
+          <p>Conexão oficial da Meta iniciou a sessão e registrou o contato na fila de Speed to Lead.</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
