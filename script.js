@@ -630,10 +630,29 @@ function filterWhatsAppContacts() {
   renderWhatsAppContacts();
 }
 
+function toggleWaMobileContacts(showList) {
+  const sidebar = document.querySelector('.whatsapp-contacts-sidebar');
+  const chat = document.getElementById('waChatPane');
+  if (sidebar && chat) {
+    if (showList) {
+      sidebar.classList.add('mobile-open');
+      chat.classList.add('mobile-hidden');
+    } else {
+      sidebar.classList.remove('mobile-open');
+      chat.classList.remove('mobile-hidden');
+    }
+  }
+}
+
 function loadWhatsAppChat(leadId) {
   APP_STATE.activeLeadId = leadId;
   const lead = LEADS.find(l => l.id === leadId);
   if (!lead) return;
+
+  // On mobile, switch to chat view automatically
+  if (window.innerWidth <= 768) {
+    toggleWaMobileContacts(false);
+  }
 
   renderWhatsAppContacts();
 

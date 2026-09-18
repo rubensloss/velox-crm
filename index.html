@@ -12,30 +12,38 @@
 </head>
 <body class="dark-theme">
   <!-- Speed to Lead SLA Floating Banner -->
+  <!-- Speed to Lead SLA Floating Banner -->
   <header class="sla-ticker-banner" id="slaBanner">
     <div class="sla-container">
-      <div class="sla-status-badge pulse-fast">
-        <i class="fa-solid fa-bolt"></i> <span>SPEED TO LEAD ATIVO</span>
-      </div>
-      <div class="sla-info">
-        <span class="sla-source"><i class="fa-solid fa-fire"></i> Novo Lead ZAP Imóveis:</span>
-        <strong id="slaLeadName">Dr. Eduardo Albuquerque</strong>
-        <span class="sla-property">procurando: <em>Cobertura Duplex Praia da Costa</em></span>
-      </div>
-      <div class="sla-countdown-box">
-        <span class="sla-label">Tempo para redistribuir:</span>
-        <div class="sla-timer" id="slaTimer">04:18</div>
-      </div>
-      <div class="sla-actions">
-        <button class="btn-sla-quick" onclick="openWhatsAppModal('lead-1')">
-          <i class="fa-brands fa-whatsapp"></i> Iniciar Atendimento
-        </button>
+      <div class="sla-mobile-header-row">
+        <div class="sla-status-badge pulse-fast">
+          <i class="fa-solid fa-bolt"></i> <span>SPEED TO LEAD</span>
+        </div>
+        <div class="sla-countdown-box">
+          <span class="sla-label">SLA:</span>
+          <div class="sla-timer" id="slaTimer">04:18</div>
+        </div>
         <button class="btn-sla-dismiss" title="Fechar barra" onclick="dismissSlaBanner()">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
+
+      <div class="sla-info">
+        <span class="sla-source"><i class="fa-solid fa-fire text-gold"></i> ZAP Imóveis:</span>
+        <strong id="slaLeadName">Dr. Eduardo</strong>
+        <span class="sla-property">&bull; <em>Cobertura Duplex</em></span>
+      </div>
+
+      <div class="sla-actions">
+        <button class="btn-sla-quick" onclick="openWhatsAppModal('lead-1')">
+          <i class="fa-brands fa-whatsapp"></i> Atender Agora
+        </button>
+      </div>
     </div>
   </header>
+
+  <!-- Sidebar Overlay Backdrop for Mobile -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 
   <div class="app-layout">
     <!-- Sidebar Navigation -->
@@ -48,6 +56,7 @@
           <h1>VELOX<span>CRM</span></h1>
           <p>Real Estate AI Platform</p>
         </div>
+        <button class="sidebar-close-btn" onclick="toggleSidebar()" aria-label="Fechar menu">&times;</button>
       </div>
 
       <div class="broker-mini-profile">
@@ -145,13 +154,15 @@
           </div>
 
           <!-- Quick Action: Novo Lead / Simular Portais -->
-          <button class="btn-secondary" onclick="simulateNewLeadArrival()">
-            <i class="fa-solid fa-bolt-lightning text-gold"></i> Simular Lead Portal
+          <button class="btn-secondary" onclick="simulateNewLeadArrival()" title="Simular chegada de lead dos portais">
+            <i class="fa-solid fa-bolt-lightning text-gold"></i>
+            <span class="btn-text-responsive">Simular Lead</span>
           </button>
 
           <!-- Quick Launch Modo Visita -->
-          <button class="btn-gold" onclick="switchTab('modo-visita')">
-            <i class="fa-solid fa-key"></i> Modo Visita
+          <button class="btn-gold btn-gold-header" onclick="switchTab('modo-visita')">
+            <i class="fa-solid fa-key"></i>
+            <span>Modo Visita</span>
           </button>
 
           <!-- Notifications -->
@@ -446,6 +457,9 @@
             <!-- Chat Header -->
             <div class="wa-chat-header">
               <div class="wa-active-user">
+                <button class="btn-icon mobile-wa-back-btn" onclick="toggleWaMobileContacts(true)" title="Voltar para lista de conversas">
+                  <i class="fa-solid fa-arrow-left"></i>
+                </button>
                 <div class="avatar-ring online">
                   <img id="waChatAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" />
                 </div>
